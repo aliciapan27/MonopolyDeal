@@ -228,7 +228,10 @@ def handle_rent_card(game, player, card):
         collect_payment(player, chosen_player, rent)
 
 def handle_just_say_no_card(game, player, card):
+    return
 
 def handle_deal_breaker_card(game, player, card):
+    return
 
 def handle_double_rent_card(game, player, card): 
+    return

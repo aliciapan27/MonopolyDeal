@@ -187,25 +187,21 @@ def handle_debt_collector_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     target_players = [p for p in game.players if p != player]
-
     chosen_player = prompt_player_choice(target_players)
     collect_payment(player, chosen_player, DEBT)
-    
-def handle_force_deal_card(game, player, card):
-    return
 
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]
 
     #Colour rent card
-    if card.colours[0] == PropertyColour.ANY:
-        valid_colours = [colour for colour in PropertyColour if colour != PropertyColour.ANY]
+    if card.colours[0] != PropertyColour.ANY:
+        valid_colours = card.colours
         #Choose colour
         print(message["colour_intro"].format(player = player.name))
         chosen_colour = prompt_colour_choice(valid_colours)
-    
+        rent = 1
         print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
-        
+    
         #Everyone pays
         for other in game.players:
             if other == player:
@@ -213,40 +209,13 @@ def handle_rent_card(game, player, card):
             collect_payment(player, other, rent)
     #ANY rent card
     else:
-        print(message["any_intro"])
+        valid_colours = [colour for colour in PropertyColour if colour != PropertyColour.ANY]
+        #Choose colour
+        print(message["any_intro"].format(player = player.name))
+        chosen_colour = prompt_colour_choice(valid_colours)
+        rent = 1
+        print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
     
-
-    # Step 2: Print intro message
-    print(message["any_rent_intro"].format(player=player.name, colour=chosen_colour.name.title(), rent=5))
-
-    # Step 3: Choose target
-    target_players = [p for p in game.players if p != player]
-    for i, other in enumerate(target_players, start=1):
-        print(f"{i}: {other.name}")
-    while True:
-        try:
-            choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= choice < len(target_players):
-                chosen_player = target_players[choice]
-                break
-            else:
-                print("Invalid choice.")
-        except ValueError:
-            print("Please enter a number.")
-
-    # Step 4: Check payment
-    if chosen_player.total_money() == 0:  # You may want to define total_money()
-        print(message["any_rent_fail"].format(target=chosen_player.name, colour=chosen_colour.name.title()))
-    else:
-        print(message["any_rent_success"].format(
-            target=chosen_player.name,
-            player=player.name,
-            rent=5,
-            colour=chosen_colour.name.title()
-        ))
-        take_money(player, chosen_player, 5)
-    
-
         #Choose player
         print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
         target_players = [p for p in game.players if p != player]

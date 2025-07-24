@@ -213,25 +213,37 @@ def handle_rent_card(game, player, card):
             collect_payment(player, other, rent)
     #ANY rent card
     else:
-        #Choose colour
-        print(message["any_intro"].format(player = player.name))
-        valid_colours = card.colours
-        chosen_colour = prompt_colour_choice(valid_colours)
-
-        rent = 1
-
-        #Choose player
-        print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
-        target_players = [p for p in game.players if p != player]
-        chosen_player = prompt_player_choice(target_players)
+        print(message["any_intro"])
     
-        collect_payment(player, chosen_player, rent)
 
-def handle_just_say_no_card(game, player, card):
-    return
+    # Step 2: Print intro message
+    print(message["any_rent_intro"].format(player=player.name, colour=chosen_colour.name.title(), rent=5))
 
-def handle_deal_breaker_card(game, player, card):
-    return
+    # Step 3: Choose target
+    target_players = [p for p in game.players if p != player]
+    for i, other in enumerate(target_players, start=1):
+        print(f"{i}: {other.name}")
+    while True:
+        try:
+            choice = int(input("Enter the number of your choice: ")) - 1
+            if 0 <= choice < len(target_players):
+                chosen_player = target_players[choice]
+                break
+            else:
+                print("Invalid choice.")
+        except ValueError:
+            print("Please enter a number.")
 
-def handle_double_rent_card(game, player, card): 
-    return
+    # Step 4: Check payment
+    if chosen_player.total_money() == 0:  # You may want to define total_money()
+        print(message["any_rent_fail"].format(target=chosen_player.name, colour=chosen_colour.name.title()))
+    else:
+        print(message["any_rent_success"].format(
+            target=chosen_player.name,
+            player=player.name,
+            rent=5,
+            colour=chosen_colour.name.title()
+        ))
+        take_money(player, chosen_player, 5)
+    
+

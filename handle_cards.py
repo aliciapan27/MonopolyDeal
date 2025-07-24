@@ -48,7 +48,7 @@ def prompt_payment(game, payer, amount_due):
                 handle_just_say_no_card(game, payer, card)
             break
 
-    print(f"{payer.name}, you owe ${amount_due}M.")
+    print(message["prompt"].format(payer=payer.name, amount_due = amount_due))
     print("Your bank:")
     for i, card in enumerate(payer.bank, start=1):
         print(f"{i}: {card}")
@@ -57,22 +57,32 @@ def prompt_payment(game, payer, amount_due):
     total_given = 0
 
     #while payer has money
-    while total_given < amount_due and payer.bank:
+    while total_given < amount_due:
+        remaining_cards = [c for i, c in enumerate(payer.bank) if i not in selected_indices]
+        remaining_value = sum(card.value for card in remaining_cards)
+
+        # if remaining_value + total_given < amount_due:
+        #     print(message["not_enough"].format(payer = payer.name))
+
+        if not remaining_cards:
+            print(message["no_money"].format(payer = payer.name))
+            break
+
         choice = input(f"Select a card number to give (total given: ${total_given}M): ")
         if not choice.isdigit():
             print("Please enter a valid number.")
             continue
 
-        idx = int(choice) - 1
-        if idx < 0 or idx >= len(payer.bank):
+        money_choice = int(choice) - 1
+        if money_choice < 0 or money_choice >= len(payer.bank):
             print("Invalid card number.")
             continue
-        if idx in selected_indices:
+        if money_choice in selected_indices:
             print("Card already selected.")
             continue
 
-        selected_indices.append(idx)
-        total_given += payer.bank[idx].value
+        selected_indices.append(money_choice)
+        total_given += payer.bank[money_choice].value
 
         if total_given < amount_due:
             print(f"Total given so far is ${total_given}M. You still owe ${amount_due - total_given}M.")

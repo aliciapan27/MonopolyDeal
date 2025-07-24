@@ -34,6 +34,9 @@ ACTION_MESSAGES = {
         "intro": "❌ \n{player} played Just Say No!"
     },
     "prompt_payment": {
-        "use_just_say_no": "\nYou have a Just Say No! Do you want to use it? (Y/N)"
+        "use_just_say_no": "\nYou have a Just Say No! Do you want to use it? (Y/N)",
+        "prompt": "\n{payer}, you owe ${amount_due}M.",
+        "not_enough": "{payer} doesn't have enough money to pay the full amount.",
+        "no_money": "{payer} has no more money in their bank."
     }
 }

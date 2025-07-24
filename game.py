@@ -63,6 +63,13 @@ class Game:
             handle_pass_go_card(self, player, card)
         elif isinstance(card, BirthdayCard):
             handle_birthday_card(self, player, card)
+        elif isinstance(card, DebtCollectorCard):
+            handle_debt_collector_card(self, player, card)
+        elif isinstance(card, RentCard):
+            handle_rent_card(self, player, card)
+        elif isinstance(card, JustSayNoCard):
+            handle_just_say_no_card(self, player, card)
+        
         else:
             print("\nAction not implemented yet")
 

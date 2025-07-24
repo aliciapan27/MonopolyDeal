@@ -247,3 +247,18 @@ def handle_rent_card(game, player, card):
         take_money(player, chosen_player, 5)
     
 
+        #Choose player
+        print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
+        target_players = [p for p in game.players if p != player]
+        chosen_player = prompt_player_choice(target_players)
+    
+        collect_payment(player, chosen_player, rent)
+
+def handle_just_say_no_card(game, player, card):
+    return
+
+def handle_deal_breaker_card(game, player, card):
+    return
+
+def handle_double_rent_card(game, player, card): 
+    return

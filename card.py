@@ -98,4 +98,5 @@ class RentCard(Card):
         super().__init__(name, CardType.ACTION, value)
         self.action_type = ActionType.RENT
         self.colours = colours
-        
+
+

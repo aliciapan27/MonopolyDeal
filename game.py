@@ -80,7 +80,8 @@ class Game:
         elif isinstance(card, DealBreakerCard):
             success = handle_deal_breaker_card(self, player, card)
         elif isinstance(card, DoubleRentCard):
-            success = handle_double_rent_card(self, player, card)
+            success = False
+            print("\nNeed to play rent card first!")
         
         
         else:

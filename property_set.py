@@ -1,3 +1,5 @@
+from card_data import PROPERTY_RENT
+
 HOUSE_RENT = 3
 HOTEL_RENT = 4
 
@@ -10,6 +12,7 @@ class PropertySet:
         self.is_full = False
         self.house_count = 0
         self.hotel_count = 0
+       
         self.rent = 0
 
     def check_if_full(self):
@@ -18,16 +21,23 @@ class PropertySet:
     def add_card(self, card):
         self.cards.append(card)
         self.is_full = self.check_if_full()
+        self.update_rent()
     
     def add_house(self):
         self.house_count += 1
-        self.rent += HOUSE_RENT
-
+        
     def add_hotel(self):
         self.hotel_count += 1
-        self.rent += HOTEL_RENT
-
+        self.update_rent()
 
     def update_rent(self):
-        # Optional: calculate based on card count or use a predefined table
-        return len(self.cards) * 1_000  # Example logic
+        if not self.cards:
+            return
+        
+        rent_table = PROPERTY_RENT[self.colour]
+        property_count = len(self.cards)
+        index = min(property_count, len(rent_table))-1
+
+        base_rent = rent_table[index]
+        self.rent = base_rent + self.house_count*HOUSE_RENT + self.hotel_count*HOTEL_RENT
+

@@ -75,6 +75,8 @@ def create_test_hand1():
     return [
         PropertyCard(PropertyColour.DARK_BLUE, "Boardwalk", FULL_SET_SIZES[PropertyColour.DARK_BLUE], PROPERTY_VALUES[PropertyColour.DARK_BLUE]),
         WildCard([PropertyColour.GREEN, PropertyColour.DARK_BLUE], 4),
+        RentCard([PropertyColour.ANY], 2),
+        DoubleRentCard(1),
         HouseCard(3),
         BirthdayCard(2),
         MoneyCard(1),

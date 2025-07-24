@@ -225,22 +225,24 @@ def handle_sly_deal_card(game, player, card):
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]
 
-    #Check if player has just say no
-    for card in player.hand:
-        if card.action_type == ActionType.DOUBLE_RENT:
-            response = input(message["double"] + " ").strip().lower()
-            
-            if response == "y":
-                handle_double_rent_card(game, player, card)
-            break
-
     #Colour rent card
     if card.colours[0] != PropertyColour.ANY:
         valid_colours = card.colours
         #Choose colour
         print(message["colour_intro"].format(player = player.name))
         chosen_colour = prompt_colour_choice(valid_colours)
-        rent = 1
+
+        #Check if player has double rent card
+        for card in player.hand:
+            if card.action_type == ActionType.DOUBLE_RENT and player.actions_remaining > 1:
+                response = input(message["double"] + " ").strip().lower()
+                
+                if response == "y":
+                    handle_double_rent_card(game, player, card)
+                    rent = 2*player.property_sets[chosen_colour].rent 
+                else:
+                    rent = player.property_sets[chosen_colour].rent
+        
         print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
     
         #Everyone pays
@@ -254,14 +256,24 @@ def handle_rent_card(game, player, card):
         #Choose colour
         print(message["any_intro"].format(player = player.name))
         chosen_colour = prompt_colour_choice(valid_colours)
-        rent = 1
+
+        #Check if player has double rent card
+        for card in player.hand:
+            if card.action_type == ActionType.DOUBLE_RENT and player.actions_remaining > 1:
+                response = input(message["double"] + " ").strip().lower()
+                
+                if response == "y":
+                    handle_double_rent_card(game, player, card)
+                    rent = 2*player.property_sets[chosen_colour].rent 
+                else:
+                    rent = player.property_sets[chosen_colour].rent
         print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
     
         #Choose player
         print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
         target_players = [p for p in game.players if p != player]
         chosen_player = prompt_player_choice(target_players)
-    
+        
         collect_payment(game, player, chosen_player, rent)
     return True
 

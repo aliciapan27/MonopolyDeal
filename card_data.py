@@ -56,18 +56,19 @@ PROPERTY_VALUES = {
     PropertyColour.UTILITY: 2
 }
 
-PROPERTY_VALUES = {
-    PropertyColour.BROWN: 1,
-    PropertyColour.LIGHT_BLUE: 1,
-    PropertyColour.PINK: 2,
-    PropertyColour.ORANGE: 2,
-    PropertyColour.RED: 3,
-    PropertyColour.YELLOW: 3,
-    PropertyColour.GREEN: 4,
-    PropertyColour.DARK_BLUE: 4,
-    PropertyColour.RAILROAD: 2,
-    PropertyColour.UTILITY: 2
+PROPERTY_RENT = {
+    PropertyColour.BROWN: [1, 2],
+    PropertyColour.LIGHT_BLUE: [1, 2, 3],
+    PropertyColour.PINK: [1, 2, 4],
+    PropertyColour.ORANGE: [1, 3, 5],
+    PropertyColour.RED: [2, 3, 6],
+    PropertyColour.YELLOW: [2, 4, 6],
+    PropertyColour.GREEN: [2, 4, 7],
+    PropertyColour.DARK_BLUE: [3, 8],
+    PropertyColour.RAILROAD: [1, 2, 3, 4],
+    PropertyColour.UTILITY: [1, 2]
 }
+
 
 PROPERTY_CARD_DATA = [
     PropertyCardInfo("Mediterranean Avenue", PropertyColour.BROWN, FULL_SET_SIZES[PropertyColour.BROWN], PROPERTY_VALUES[PropertyColour.BROWN]),

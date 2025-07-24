@@ -47,7 +47,7 @@ class Player:
             choice = input("Enter the number of the card to play (or 'q' to quit): ")
 
             if choice.lower() == 'q':
-                return None
+                return None, None
 
             if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
                 print("Invalid choice. Try again.")

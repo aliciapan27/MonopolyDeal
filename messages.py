@@ -28,9 +28,16 @@ ACTION_MESSAGES = {
         "any_intro": "\n💸 Time to pay rent for! {player}, choose a colour property.",
         "choose_target": "\nForce a player to pay you ${rent}M for {colour} properties.",        
         "any_success": "\n {target} pays {player} ${rent}M.",
-        "fail": "\n{target} has no money to pay."
+        "fail": "\n{target} has no money to pay.",
+        "double": "\nYou have a Double the Rent card! Do you want to use it? (Y/N)"
     },
     ActionType.JUST_SAY_NO: {
+        "intro": "❌ \n{player} played Just Say No!"
+    },
+    ActionType.DOUBLE_RENT: {
+        "intro": "🚨💰 \n{player} doubled the rent!"
+    },
+    ActionType.FORCE_DEAL: {
         "intro": "❌ \n{player} played Just Say No!"
     },
     "prompt_payment": {

@@ -46,7 +46,11 @@ class Game:
                 break
         
             self.play_card(player, chosen_card, card_index)
-            player.actions_remaining -= 1
+    
+    def discard_card(self, player, card):
+        if card in player.hand:
+            player.hand.remove(card)
+        self.discard_pile.append(card)
         
     def play_card(self, player, card, card_index):
         if isinstance(card, MoneyCard):
@@ -65,10 +69,19 @@ class Game:
             success = handle_birthday_card(self, player, card)
         elif isinstance(card, DebtCollectorCard):
             success = handle_debt_collector_card(self, player, card)
+        elif isinstance(card, ForceDealCard):
+            success = handle_force_deal_card(self, player, card)
+        elif isinstance(card, SlyDealCard):
+            success = handle_sly_deal_card(self, player, card)
         elif isinstance(card, RentCard):
             success = handle_rent_card(self, player, card)
         elif isinstance(card, JustSayNoCard):
             success = handle_just_say_no_card(self, player, card)
+        elif isinstance(card, DealBreakerCard):
+            success = handle_deal_breaker_card(self, player, card)
+        elif isinstance(card, DoubleRentCard):
+            success = handle_double_rent_card(self, player, card)
+        
         
         else:
             success = False
@@ -77,6 +90,8 @@ class Game:
         #pop from hand
         if success:
             player.hand.pop(card_index)
+            self.discard_card(player, card)
+            player.actions_remaining -= 1
 
     def check_win_condition(self):
         for player in self.players:

@@ -100,11 +100,6 @@ def collect_payment(game, collector, payer, amount):
         collector.bank.extend(cards_given)
         return True
 
-def discard_card(game, player, card):
-    if card in player.hand:
-        player.hand.remove(card)
-    game.discard_pile.append(card)
-
 #Action card Handlers
 def handle_money_card(game, player, card):
     player.bank.append(card)
@@ -196,14 +191,12 @@ def handle_hotel_card(game, player, card):
 
 def handle_pass_go_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.PASS_GO]
-    discard_card(game, player, card)
     print(message["intro"])
     player.draw_cards(game.deck, 2)
     return True
 
 def handle_birthday_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.BIRTHDAY]
-    discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     print(message["collect"].format(player = player.name))
 
@@ -216,7 +209,6 @@ def handle_birthday_card(game, player, card):
     
 def handle_debt_collector_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.DEBT_COLLECTOR]
-    discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     
     target_players = [p for p in game.players if p != player]
@@ -224,9 +216,23 @@ def handle_debt_collector_card(game, player, card):
     collect_payment(game, player, chosen_player, DEBT)
     return True
 
+def handle_force_deal_card(game, player, card):   
+    return
+
+def handle_sly_deal_card(game, player, card):
+    return
+
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]
-    discard_card(game, player, card)
+
+    #Check if player has just say no
+    for card in player.hand:
+        if card.action_type == ActionType.DOUBLE_RENT:
+            response = input(message["double"] + " ").strip().lower()
+            
+            if response == "y":
+                handle_double_rent_card(game, player, card)
+            break
 
     #Colour rent card
     if card.colours[0] != PropertyColour.ANY:
@@ -261,7 +267,6 @@ def handle_rent_card(game, player, card):
 
 def handle_just_say_no_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
-    discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     
     return True
@@ -269,5 +274,7 @@ def handle_just_say_no_card(game, player, card):
 def handle_deal_breaker_card(game, player, card):
     return True
 
-def handle_double_rent_card(game, player, card): 
+def handle_double_rent_card(game, player, card):
+    message = ACTION_MESSAGES[ActionType.DOUBLE_RENT]
+    print(message["intro"].format(player = player.name))
     return True

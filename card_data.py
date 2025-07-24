@@ -7,6 +7,7 @@ class PropertyCardInfo:
     name: str
     colour: PropertyColour
     full_set: int
+    value: int
 
 @dataclass
 class ActionCardInfo:
@@ -29,35 +30,61 @@ class WildCardInfo:
 #{value: count}
 MONEY_DATA = {1: 6, 2: 5, 3: 3, 4: 3, 5: 2, 10: 1}
 
+FULL_SET_SIZES = {
+    PropertyColour.BROWN: 2,
+    PropertyColour.LIGHT_BLUE: 3,
+    PropertyColour.PINK: 3,
+    PropertyColour.ORANGE: 3,
+    PropertyColour.RED: 3,
+    PropertyColour.YELLOW: 3,
+    PropertyColour.GREEN: 3,
+    PropertyColour.DARK_BLUE: 2,
+    PropertyColour.RAILROAD: 4,
+    PropertyColour.UTILITY: 2
+}
+
+PROPERTY_VALUES = {
+    PropertyColour.BROWN: 1,
+    PropertyColour.LIGHT_BLUE: 1,
+    PropertyColour.PINK: 2,
+    PropertyColour.ORANGE: 2,
+    PropertyColour.RED: 3,
+    PropertyColour.YELLOW: 3,
+    PropertyColour.GREEN: 4,
+    PropertyColour.DARK_BLUE: 4,
+    PropertyColour.RAILROAD: 2,
+    PropertyColour.UTILITY: 2
+}
+
 PROPERTY_CARD_DATA = [
-    PropertyCardInfo("Mediterranean Avenue", PropertyColour.BROWN, 2),
-    PropertyCardInfo("Baltic Avenue", PropertyColour.BROWN, 2),
-    PropertyCardInfo("Oriental Avenue", PropertyColour.LIGHT_BLUE, 3),
-    PropertyCardInfo("Vermont Avenue", PropertyColour.LIGHT_BLUE, 3),
-    PropertyCardInfo("Connecticut Avenue", PropertyColour.LIGHT_BLUE, 3),
-    PropertyCardInfo("St. Charles Place", PropertyColour.PINK, 3),
-    PropertyCardInfo("States Avenue", PropertyColour.PINK, 3),
-    PropertyCardInfo("Virginia Avenue", PropertyColour.PINK, 3),
-    PropertyCardInfo("St. James Place", PropertyColour.ORANGE, 3),
-    PropertyCardInfo("Tennessee Avenue", PropertyColour.ORANGE, 3),
-    PropertyCardInfo("New York Avenue", PropertyColour.ORANGE, 3),
-    PropertyCardInfo("Kentucky Avenue", PropertyColour.RED, 3),
-    PropertyCardInfo("Indiana Avenue", PropertyColour.RED, 3),
-    PropertyCardInfo("Illinois Avenue", PropertyColour.RED, 3),
-    PropertyCardInfo("Atlantic Avenue", PropertyColour.YELLOW, 3),
-    PropertyCardInfo("Ventnor Avenue", PropertyColour.YELLOW, 3),
-    PropertyCardInfo("Marvin Gardens", PropertyColour.YELLOW, 3),
-    PropertyCardInfo("Pacific Avenue", PropertyColour.GREEN, 3),
-    PropertyCardInfo("North Carolina Avenue", PropertyColour.GREEN, 3),
-    PropertyCardInfo("Pennsylvania Avenue", PropertyColour.GREEN, 3),
-    PropertyCardInfo("Park Place", PropertyColour.DARK_BLUE, 2),
-    PropertyCardInfo("Boardwalk", PropertyColour.DARK_BLUE, 2),
-    PropertyCardInfo("Reading Railroad", PropertyColour.RAILROAD, 3),
-    PropertyCardInfo("Pennsylvania Railroad", PropertyColour.RAILROAD, 3),
-    PropertyCardInfo("B&O Railroad", PropertyColour.RAILROAD, 3),
-    PropertyCardInfo("Short Line", PropertyColour.RAILROAD, 3),
-    PropertyCardInfo("Electric Company", PropertyColour.UTILITY, 2),
-    PropertyCardInfo("Water Works", PropertyColour.UTILITY, 2),
+    PropertyCardInfo("Mediterranean Avenue", PropertyColour.BROWN, FULL_SET_SIZES[PropertyColour.BROWN], PROPERTY_VALUES[PropertyColour.BROWN]),
+    PropertyCardInfo("Baltic Avenue", PropertyColour.BROWN, FULL_SET_SIZES[PropertyColour.BROWN], PROPERTY_VALUES[PropertyColour.BROWN]),
+    PropertyCardInfo("Oriental Avenue", PropertyColour.LIGHT_BLUE, FULL_SET_SIZES[PropertyColour.LIGHT_BLUE], PROPERTY_VALUES[PropertyColour.LIGHT_BLUE]),
+    PropertyCardInfo("Vermont Avenue", PropertyColour.LIGHT_BLUE, FULL_SET_SIZES[PropertyColour.LIGHT_BLUE], PROPERTY_VALUES[PropertyColour.LIGHT_BLUE]),
+    PropertyCardInfo("Connecticut Avenue", PropertyColour.LIGHT_BLUE, FULL_SET_SIZES[PropertyColour.LIGHT_BLUE], PROPERTY_VALUES[PropertyColour.LIGHT_BLUE]),
+    PropertyCardInfo("St. Charles Place", PropertyColour.PINK, FULL_SET_SIZES[PropertyColour.PINK], PROPERTY_VALUES[PropertyColour.PINK]),
+    PropertyCardInfo("States Avenue", PropertyColour.PINK, FULL_SET_SIZES[PropertyColour.PINK], PROPERTY_VALUES[PropertyColour.PINK]),
+    PropertyCardInfo("Virginia Avenue", PropertyColour.PINK, FULL_SET_SIZES[PropertyColour.PINK], PROPERTY_VALUES[PropertyColour.PINK]),
+    PropertyCardInfo("St. James Place", PropertyColour.ORANGE, FULL_SET_SIZES[PropertyColour.ORANGE], PROPERTY_VALUES[PropertyColour.ORANGE]),
+    PropertyCardInfo("Tennessee Avenue", PropertyColour.ORANGE, FULL_SET_SIZES[PropertyColour.ORANGE], PROPERTY_VALUES[PropertyColour.ORANGE]),
+    PropertyCardInfo("New York Avenue", PropertyColour.ORANGE, FULL_SET_SIZES[PropertyColour.ORANGE], PROPERTY_VALUES[PropertyColour.ORANGE]),
+    PropertyCardInfo("Kentucky Avenue", PropertyColour.RED, FULL_SET_SIZES[PropertyColour.RED], PROPERTY_VALUES[PropertyColour.RED]),
+    PropertyCardInfo("Indiana Avenue", PropertyColour.RED, FULL_SET_SIZES[PropertyColour.RED], PROPERTY_VALUES[PropertyColour.RED]),
+    PropertyCardInfo("Illinois Avenue", PropertyColour.RED, FULL_SET_SIZES[PropertyColour.RED], PROPERTY_VALUES[PropertyColour.RED]),
+    PropertyCardInfo("Atlantic Avenue", PropertyColour.YELLOW, FULL_SET_SIZES[PropertyColour.YELLOW], PROPERTY_VALUES[PropertyColour.YELLOW]),
+    PropertyCardInfo("Ventnor Avenue", PropertyColour.YELLOW, FULL_SET_SIZES[PropertyColour.YELLOW], PROPERTY_VALUES[PropertyColour.YELLOW]),
+    PropertyCardInfo("Marvin Gardens", PropertyColour.YELLOW, FULL_SET_SIZES[PropertyColour.YELLOW], PROPERTY_VALUES[PropertyColour.YELLOW]),
+    PropertyCardInfo("Pacific Avenue", PropertyColour.GREEN, FULL_SET_SIZES[PropertyColour.GREEN], PROPERTY_VALUES[PropertyColour.GREEN]),
+    PropertyCardInfo("North Carolina Avenue", PropertyColour.GREEN, FULL_SET_SIZES[PropertyColour.GREEN], PROPERTY_VALUES[PropertyColour.GREEN]),
+    PropertyCardInfo("Pennsylvania Avenue", PropertyColour.GREEN, FULL_SET_SIZES[PropertyColour.GREEN], PROPERTY_VALUES[PropertyColour.GREEN]),
+    PropertyCardInfo("Park Place", PropertyColour.DARK_BLUE, FULL_SET_SIZES[PropertyColour.DARK_BLUE], PROPERTY_VALUES[PropertyColour.DARK_BLUE]),
+    PropertyCardInfo("Boardwalk", PropertyColour.DARK_BLUE, FULL_SET_SIZES[PropertyColour.DARK_BLUE], PROPERTY_VALUES[PropertyColour.DARK_BLUE]),
+    PropertyCardInfo("Reading Railroad", PropertyColour.RAILROAD, FULL_SET_SIZES[PropertyColour.RAILROAD], PROPERTY_VALUES[PropertyColour.RAILROAD]),
+    PropertyCardInfo("Pennsylvania Railroad", PropertyColour.RAILROAD, FULL_SET_SIZES[PropertyColour.RAILROAD], PROPERTY_VALUES[PropertyColour.RAILROAD]),
+    PropertyCardInfo("B&O Railroad", PropertyColour.RAILROAD, FULL_SET_SIZES[PropertyColour.RAILROAD], PROPERTY_VALUES[PropertyColour.RAILROAD]),
+    PropertyCardInfo("Short Line", PropertyColour.RAILROAD, FULL_SET_SIZES[PropertyColour.RAILROAD], PROPERTY_VALUES[PropertyColour.RAILROAD]),
+    PropertyCardInfo("Electric Company", PropertyColour.UTILITY, FULL_SET_SIZES[PropertyColour.UTILITY], PROPERTY_VALUES[PropertyColour.UTILITY]),
+    PropertyCardInfo("Water Works", PropertyColour.UTILITY, FULL_SET_SIZES[PropertyColour.UTILITY], PROPERTY_VALUES[PropertyColour.UTILITY]),
 ]
 
 ACTION_DATA = [
@@ -93,15 +120,3 @@ WILDCARD_DATA = [
     WildCardInfo((PropertyColour.ANY,), 2, 0),
 ]
 
-FULL_SET_SIZES = {
-    PropertyColour.BROWN: 2,
-    PropertyColour.LIGHT_BLUE: 3,
-    PropertyColour.PINK: 3,
-    PropertyColour.ORANGE: 3,
-    PropertyColour.RED: 3,
-    PropertyColour.YELLOW: 3,
-    PropertyColour.GREEN: 3,
-    PropertyColour.DARK_BLUE: 2,
-    PropertyColour.RAILROAD: 4,
-    PropertyColour.UTILITY: 2
-}

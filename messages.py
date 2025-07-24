@@ -26,7 +26,8 @@ ACTION_MESSAGES = {
         "colour_intro": "\n💸 Time to pay rent! {player}, choose a colour property.",
         "colour_collect": "\nEveryone pays {player} ${rent}M for {colour} properties!",
         "any_intro": "\n💸 Time to pay rent for! {player}, choose a colour property.",
-        "choose_target": "\nforce a player to pay you ${rent}M for {colour} properties.",        "any_success": "\n {target} pays {player} ${rent}M.",
+        "choose_target": "\nForce a player to pay you ${rent}M for {colour} properties.",        
+        "any_success": "\n {target} pays {player} ${rent}M.",
         "fail": "\n{target} has no money to pay."
     },
 }

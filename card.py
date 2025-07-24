@@ -99,5 +99,3 @@ class RentCard(Card):
         self.action_type = ActionType.RENT
         self.colours = colours
         
-
-

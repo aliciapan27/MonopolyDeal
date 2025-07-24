@@ -1,5 +1,6 @@
 from property_set import PropertySet
 from enums import PropertyColour, ActionType
+from card import JustSayNoCard
 from card_data import FULL_SET_SIZES
 from messages import ACTION_MESSAGES
 
@@ -36,7 +37,17 @@ def prompt_player_choice(target_players):
         except ValueError:
             print("Please enter a number.")
 
-def prompt_payment(payer, amount_due):
+def prompt_payment(game, payer, amount_due):
+    message = ACTION_MESSAGES["prompt_payment"]
+    #Check if player has just say no
+    for card in payer.hand:
+        if card.action_type == ActionType.JUST_SAY_NO:
+            response = input(message["use_just_say_no"] + " ").strip().lower()
+            
+            if response == "y":
+                handle_just_say_no_card(game, payer, card)
+            break
+
     print(f"{payer.name}, you owe ${amount_due}M.")
     print("Your bank:")
     for i, card in enumerate(payer.bank, start=1):
@@ -45,7 +56,8 @@ def prompt_payment(payer, amount_due):
     selected_indices = []
     total_given = 0
 
-    while total_given < amount_due:
+    #while payer has money
+    while total_given < amount_due and payer.bank:
         choice = input(f"Select a card number to give (total given: ${total_given}M): ")
         if not choice.isdigit():
             print("Please enter a valid number.")
@@ -69,14 +81,19 @@ def prompt_payment(payer, amount_due):
     selected_indices.sort(reverse=True)
     return [payer.bank.pop(i) for i in selected_indices]
 
-def collect_payment(collector, payer, amount):
+def collect_payment(game, collector, payer, amount):
         if len(payer.bank) == 0:
             print(f"{payer.name} has no money to pay.")
             return False
 
-        cards_given = prompt_payment(payer, amount)
+        cards_given = prompt_payment(game, payer, amount)
         collector.bank.extend(cards_given)
         return True
+
+def discard_card(game, player, card):
+    if card in player.hand:
+        player.hand.remove(card)
+    game.discard_pile.append(card)
 
 #Action card Handlers
 def handle_money_card(game, player, card):
@@ -168,11 +185,13 @@ def handle_hotel_card(game, player, card):
 
 def handle_pass_go_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.PASS_GO]
+    discard_card(game, player, card)
     print(message["intro"])
     player.draw_cards(game.deck, 2)
 
 def handle_birthday_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.BIRTHDAY]
+    discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     print(message["collect"].format(player = player.name))
 
@@ -180,18 +199,20 @@ def handle_birthday_card(game, player, card):
     for other in game.players:
         if other == player:
             continue
-        collect_payment(player, other, BDAY_DEBT)
+        collect_payment(game, player, other, BDAY_DEBT)
     
 def handle_debt_collector_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.DEBT_COLLECTOR]
+    discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     
     target_players = [p for p in game.players if p != player]
     chosen_player = prompt_player_choice(target_players)
-    collect_payment(player, chosen_player, DEBT)
+    collect_payment(game, player, chosen_player, DEBT)
 
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]
+    discard_card(game, player, card)
 
     #Colour rent card
     if card.colours[0] != PropertyColour.ANY:
@@ -206,7 +227,7 @@ def handle_rent_card(game, player, card):
         for other in game.players:
             if other == player:
                 continue
-            collect_payment(player, other, rent)
+            collect_payment(game, player, other, rent)
     #ANY rent card
     else:
         valid_colours = [colour for colour in PropertyColour if colour != PropertyColour.ANY]
@@ -221,9 +242,13 @@ def handle_rent_card(game, player, card):
         target_players = [p for p in game.players if p != player]
         chosen_player = prompt_player_choice(target_players)
     
-        collect_payment(player, chosen_player, rent)
+        collect_payment(game, player, chosen_player, rent)
 
 def handle_just_say_no_card(game, player, card):
+    message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
+    discard_card(game, player, card)
+    print(message["intro"].format(player = player.name))
+    
     return
 
 def handle_deal_breaker_card(game, player, card):

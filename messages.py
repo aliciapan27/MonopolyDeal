@@ -30,4 +30,10 @@ ACTION_MESSAGES = {
         "any_success": "\n {target} pays {player} ${rent}M.",
         "fail": "\n{target} has no money to pay."
     },
+    ActionType.JUST_SAY_NO: {
+        "intro": "❌ \n{player} played Just Say No!"
+    },
+    "prompt_payment": {
+        "use_just_say_no": "\nYou have a Just Say No! Do you want to use it? (Y/N)"
+    }
 }

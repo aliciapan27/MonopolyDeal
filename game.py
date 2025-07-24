@@ -16,7 +16,7 @@ class Game:
         self.deck = create_deck()
 
     def start(self):
-        #shuffle_deck(self.deck)
+        shuffle_deck(self.deck)
 
         # Deal 5 cards to each player
 
@@ -25,7 +25,6 @@ class Game:
         else:
             for player in self.players:
                 player.draw_cards(self.deck, STARTING_HAND)
-
 
     def game_loop(self):
         while not self.check_win_condition():
@@ -49,7 +48,6 @@ class Game:
             self.play_card(player, chosen_card)
             player.actions_remaining -= 1
         
-    
     def play_card(self, player, card):
         if isinstance(card, MoneyCard):
             handle_money_card(self, player, card)
@@ -67,9 +65,6 @@ class Game:
             handle_birthday_card(self, player, card)
         else:
             print("\nAction not implemented yet")
-
-            
-
 
     def check_win_condition(self):
         for player in self.players:

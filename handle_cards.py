@@ -1,5 +1,6 @@
 from property_set import PropertySet
-from enums import FULL_SET_SIZES, PropertyColour
+from enums import PropertyColour
+from card_data import FULL_SET_SIZES
 
 BDAY_DEBT = 2
 DEBT = 5
@@ -148,7 +149,7 @@ def take_money(player, other, amount_due):
         if total_given < amount_due:
             print(f"Total given so far is ${total_given}M. You still owe ${amount_due - total_given}M.")
 
-    # Now remove the chosen cards in reverse order so indices don't shift
+    # remove the chosen cards in reverse order so indices don't shift
     selected_indices.sort(reverse=True)
     cards_given = []
     for idx in selected_indices:
@@ -171,7 +172,7 @@ def handle_birthday_card(game, player, card):
         take_money(player, other, BDAY_DEBT)
 
 def handle_debt_collector_card(game, player, card):
-    print(f"\nChoose a player to pay $5M.")
+    print(f"\n💰Debt Collector! Choose any player to pay you $5M.")
     for i, other in enumerate(game.players, start=1):
         if other == player:
             continue

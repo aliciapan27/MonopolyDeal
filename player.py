@@ -1,5 +1,3 @@
-from enums import FULL_SET_SIZES
-
 RESET_ACTIONS = 3
 
 class Player:

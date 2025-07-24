@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from enums import PropertyColour
 from card import *
 
-# Data classes to structure the data clearly
 @dataclass
 class PropertyCardInfo:
     name: str
@@ -93,3 +92,16 @@ WILDCARD_DATA = [
     WildCardInfo((PropertyColour.RED, PropertyColour.YELLOW), 2, 3),
     WildCardInfo((PropertyColour.ANY,), 2, 0),
 ]
+
+FULL_SET_SIZES = {
+    PropertyColour.BROWN: 2,
+    PropertyColour.LIGHT_BLUE: 3,
+    PropertyColour.PINK: 3,
+    PropertyColour.ORANGE: 3,
+    PropertyColour.RED: 3,
+    PropertyColour.YELLOW: 3,
+    PropertyColour.GREEN: 3,
+    PropertyColour.DARK_BLUE: 2,
+    PropertyColour.RAILROAD: 4,
+    PropertyColour.UTILITY: 2
+}

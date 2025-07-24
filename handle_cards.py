@@ -108,11 +108,13 @@ def discard_card(game, player, card):
 #Action card Handlers
 def handle_money_card(game, player, card):
     player.bank.append(card)
+    return True
 
 def handle_property_card(game, player, card):
     if card.colour not in player.property_sets:
         player.property_sets[card.colour] = PropertySet(card.colour, FULL_SET_SIZES.get(card.colour, float('inf')))
     player.property_sets[card.colour].add_card(card)
+    return True
     
 def handle_wildcard(game, player, card):
     # Universal wildcard
@@ -130,8 +132,7 @@ def handle_wildcard(game, player, card):
         player.property_sets[chosen_colour] = PropertySet(chosen_colour, FULL_SET_SIZES.get(chosen_colour, float('inf')))
     
     player.property_sets[chosen_colour].add_card(card)
-
-    return
+    return True
 
 def handle_house_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.HOUSE]
@@ -140,7 +141,7 @@ def handle_house_card(game, player, card):
         
     if not full_sets:
         print(message["fail"])
-        return
+        return False
         
     print(message["intro"])
     for i, prop_set in enumerate(full_sets, start = 1):
@@ -161,7 +162,7 @@ def handle_house_card(game, player, card):
 
     # Add house to set
     chosen_set.add_house()
-    return
+    return True
 
 def handle_hotel_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.HOTEL]
@@ -170,7 +171,7 @@ def handle_hotel_card(game, player, card):
         
     if not full_sets:
         print(message["fail"])
-        return
+        return False
         
     print(message["intro"])
     for i, prop_set in enumerate(full_sets, start = 1):
@@ -191,13 +192,14 @@ def handle_hotel_card(game, player, card):
 
     # Add hotel to set
     chosen_set.add_hotel()
-    return
+    return True
 
 def handle_pass_go_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.PASS_GO]
     discard_card(game, player, card)
     print(message["intro"])
     player.draw_cards(game.deck, 2)
+    return True
 
 def handle_birthday_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.BIRTHDAY]
@@ -210,6 +212,7 @@ def handle_birthday_card(game, player, card):
         if other == player:
             continue
         collect_payment(game, player, other, BDAY_DEBT)
+    return True
     
 def handle_debt_collector_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.DEBT_COLLECTOR]
@@ -219,6 +222,7 @@ def handle_debt_collector_card(game, player, card):
     target_players = [p for p in game.players if p != player]
     chosen_player = prompt_player_choice(target_players)
     collect_payment(game, player, chosen_player, DEBT)
+    return True
 
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]
@@ -253,16 +257,17 @@ def handle_rent_card(game, player, card):
         chosen_player = prompt_player_choice(target_players)
     
         collect_payment(game, player, chosen_player, rent)
+    return True
 
 def handle_just_say_no_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
     discard_card(game, player, card)
     print(message["intro"].format(player = player.name))
     
-    return
+    return True
 
 def handle_deal_breaker_card(game, player, card):
-    return
+    return True
 
 def handle_double_rent_card(game, player, card): 
-    return
+    return True

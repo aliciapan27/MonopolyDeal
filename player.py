@@ -54,9 +54,10 @@ class Player:
                 continue
 
             card_index = int(choice)-1
-            chosen_card = self.hand.pop(card_index)
+            # chosen_card = self.hand.pop(card_index)
+            chosen_card = self.hand[card_index]
             print(f"\nYou chose {chosen_card.name}")
-            return chosen_card
+            return chosen_card, card_index
             
     def draw_cards(self, deck, count):
         drawn_cards = []
@@ -73,9 +74,6 @@ class Player:
             for card in drawn_cards:
                 print(f"- {card}")
 
-    def play_card(self, card):
-        card.play(self)
-        return
 
 
     

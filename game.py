@@ -39,39 +39,44 @@ class Game:
         player.draw_cards(self.deck, DRAW_TWO)
 
         while player.actions_remaining > 0:
-            chosen_card = player.choose_card()
+            chosen_card, card_index = player.choose_card()
 
             if chosen_card is None:
                 print("Turn ended.")
                 break
         
-            self.play_card(player, chosen_card)
+            self.play_card(player, chosen_card, card_index)
             player.actions_remaining -= 1
         
-    def play_card(self, player, card):
+    def play_card(self, player, card, card_index):
         if isinstance(card, MoneyCard):
-            handle_money_card(self, player, card)
+            success = handle_money_card(self, player, card)
         elif isinstance(card, PropertyCard):
-            handle_property_card(self, player, card)
+            success = handle_property_card(self, player, card)
         elif isinstance(card, WildCard):
-            handle_wildcard(self, player, card)
+            success = handle_wildcard(self, player, card)
         elif isinstance(card, HouseCard):
-            handle_house_card(self, player, card)
+            success = handle_house_card(self, player, card)
         elif isinstance(card, HotelCard):
-            handle_hotel_card(self, player, card)
+            success = handle_hotel_card(self, player, card)
         elif isinstance(card, PassGoCard):
-            handle_pass_go_card(self, player, card)
+            success = handle_pass_go_card(self, player, card)
         elif isinstance(card, BirthdayCard):
-            handle_birthday_card(self, player, card)
+            success = handle_birthday_card(self, player, card)
         elif isinstance(card, DebtCollectorCard):
-            handle_debt_collector_card(self, player, card)
+            success = handle_debt_collector_card(self, player, card)
         elif isinstance(card, RentCard):
-            handle_rent_card(self, player, card)
+            success = handle_rent_card(self, player, card)
         elif isinstance(card, JustSayNoCard):
-            handle_just_say_no_card(self, player, card)
+            success = handle_just_say_no_card(self, player, card)
         
         else:
+            success = False
             print("\nAction not implemented yet")
+
+        #pop from hand
+        if success:
+            player.hand.pop(card_index)
 
     def check_win_condition(self):
         for player in self.players:

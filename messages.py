@@ -29,6 +29,11 @@ ACTION_MESSAGES = {
         "wanted_card": "\nWhich one of {player}'s properties do you want?",
         "your_card": "Which one of your properties do you want to swap?"
     },
+    ActionType.SLY_DEAL: {
+        "intro": "\n🔁  Sly Deal! {player}, choose a player to steal from.",
+        "fail": "\nNo other players have stealable properties.",
+        "wanted_card": "\nWhich one of {player}'s properties do you want?"
+    },
     ActionType.RENT: {
         "colour_intro": "\n💸 Time to pay rent! {player}, choose a colour property.",
         "colour_collect": "\nEveryone pays {player} ${rent}M for {colour} properties!",

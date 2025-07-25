@@ -135,6 +135,20 @@ def collect_payment(game, collector, payer, amount):
         collector.bank.extend(cards_given)
         return True
 
+def players_with_tradeable(game, player):
+    players_with_tradeables = []
+
+    for other in game.players:
+        if other == player:
+            continue
+
+        tradeable_sets = other.get_tradeable_properties()
+
+        if tradeable_sets:
+            players_with_tradeables.append(other)
+
+    return players_with_tradeables
+
 #Action card Handlers
 def handle_money_card(game, player, card):
     player.bank.append(card)
@@ -159,7 +173,6 @@ def handle_wildcard(game, player, card):
     
     #set wildcard colour
     card.colour = chosen_colour
-    
     # Add property to dictionary
     if chosen_colour not in player.property_sets:
         player.property_sets[chosen_colour] = PropertySet(chosen_colour, FULL_SET_SIZES.get(chosen_colour, float('inf')))
@@ -254,33 +267,19 @@ def handle_debt_collector_card(game, player, card):
     collect_payment(game, player, chosen_player, DEBT)
     return True
 
-def players_with_tradeable(game, player):
-    players_with_tradeables = []
-
-    for other in game.players:
-        if other == player:
-            continue
-
-        tradeable_sets = other.get_tradeable_properties()
-
-        if tradeable_sets:
-            players_with_tradeables.append(other)
-
-    return players_with_tradeables
-
 def handle_force_deal_card(game, player, card): 
     message = ACTION_MESSAGES[ActionType.FORCE_DEAL]
 
     #player has no properties to trade
     if not player.property_sets:
-        print(message["fail1"].format(player = player.name))
+        print(message["fail1"])
         return False
     
     target_players =  players_with_tradeable(game, player)
 
     #no other players have properties to trade
     if not target_players:
-        print(message["fail2"].format(player = player.name))
+        print(message["fail2"])
         return False
 
     print(message["intro"].format(player = player.name))
@@ -311,7 +310,32 @@ def handle_force_deal_card(game, player, card):
     return True
 
 def handle_sly_deal_card(game, player, card):
-    return
+    message = ACTION_MESSAGES[ActionType.SLY_DEAL]
+    
+    target_players =  players_with_tradeable(game, player)
+
+    #no other players have properties to steal from
+    if not target_players:
+        print(message["fail"])
+        return False
+
+    print(message["intro"].format(player = player.name))
+    
+    #choose player to steal from
+    chosen_player = prompt_player_choice(target_players)
+
+    #choose property to steal
+    print(message["wanted_card"].format(player=chosen_player.name))
+    wanted_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+    
+    #remove card from set
+    chosen_player.property_sets[wanted_card.colour].remove_card(wanted_card)
+    
+    if wanted_card.colour not in player.property_sets:
+        player.property_sets[wanted_card.colour] = PropertySet(wanted_card.colour, FULL_SET_SIZES.get(wanted_card.colour, float('inf')))
+    player.property_sets[wanted_card.colour].add_card(wanted_card)
+
+    return True
 
 def handle_rent_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.RENT]

@@ -70,3 +70,10 @@ class Player:
             if not prop_set.is_full:
                 tradeables.extend(prop_set.cards)
         return tradeables
+    
+    def get_full_sets(self):
+        full_sets = []
+        for prop_set in self.property_sets.values():
+            if prop_set.is_full:
+                full_sets.append(prop_set)
+        return full_sets

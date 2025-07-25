@@ -91,6 +91,7 @@ def create_test_hand2():
         WildCard([PropertyColour.GREEN, PropertyColour.DARK_BLUE], 4),
         JustSayNoCard(4),
         SlyDealCard(3),
+        DealBreakerCard(5),
         DebtCollectorCard(3),
         BirthdayCard(2),
         DoubleRentCard(1),

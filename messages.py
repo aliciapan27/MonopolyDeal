@@ -23,14 +23,14 @@ ACTION_MESSAGES = {
         "fail": "\n{target} has no money to pay."
     },
     ActionType.FORCE_DEAL: {
-        "intro": "\n🔁  Forced Deal! {player}, force a player to swap properties with you.",
+        "intro": "\n🔁 Forced Deal! {player}, force a player to swap properties with you.",
         "fail1": "\nYou have no properties to trade.",
         "fail2": "\nNo other players have tradeable properties.",
         "wanted_card": "\nWhich one of {player}'s properties do you want?",
         "your_card": "Which one of your properties do you want to swap?"
     },
     ActionType.SLY_DEAL: {
-        "intro": "\n🔁  Sly Deal! {player}, choose a player to steal from.",
+        "intro": "\n🕵️ Sly Deal! {player}, choose a player to steal from.",
         "fail": "\nNo other players have stealable properties.",
         "wanted_card": "\nWhich one of {player}'s properties do you want?"
     },
@@ -51,7 +51,11 @@ ACTION_MESSAGES = {
     ActionType.DOUBLE_RENT: {
         "intro": "\n🚨💰 {player} doubled the rent!"
     },
-    
+    ActionType.DEAL_BREAKER: {
+        "intro": "\n💼💥 Deal Breaker! {player}, steal any full set!",
+        "fail": "\nNo players have full sets to steal.",
+        "wanted_card": "\nWhich one of {player}'s full sets' do you want?"
+    },
     "prompt_payment": {
         "prompt": "\n{payer}, you owe ${amount_due}M.",
         "not_enough": "{payer} doesn't have enough money to pay the full amount.",

@@ -54,6 +54,23 @@ def prompt_property_choice(properties):
         except ValueError:
             print("Please enter a number.")
 
+def prompt_full_set_choice(full_sets):
+    print("\nChoose a full set:")
+
+    for i, property in enumerate(full_sets, start = 1):
+        print(f"{i}: {str(property)}")
+            
+    while True:
+        try:
+            choice = int(input("Enter the number of your choice: ")) - 1
+            if 0 <= choice < len(full_sets):
+                return full_sets[choice]
+            else:
+                print("Invalid choice. Try again.")
+
+        except ValueError:
+            print("Please enter a number.")
+
 def try_just_say_no(game, attacker, defender):
     message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
     #Check if player has just say no
@@ -148,6 +165,21 @@ def players_with_tradeable(game, player):
             players_with_tradeables.append(other)
 
     return players_with_tradeables
+
+def players_with_full_sets(game, player):
+    players_with_full_sets = []
+
+    for other in game.players:
+        if other == player:
+            continue
+
+        full_sets = other.get_full_sets()
+
+        if full_sets:
+            players_with_full_sets.append(other)
+
+    return players_with_full_sets
+
 
 #Action card Handlers
 def handle_money_card(game, player, card):
@@ -399,6 +431,32 @@ def handle_just_say_no_card(game, player, card):
     return True
 
 def handle_deal_breaker_card(game, player, card):
+    message = ACTION_MESSAGES[ActionType.DEAL_BREAKER]
+    
+    target_players =  players_with_full_sets(game, player)
+
+    #no other players have properties to steal from
+    if not target_players:
+        print(message["fail"])
+        return False
+
+    print(message["intro"].format(player = player.name))
+    
+    #choose player to steal from
+    chosen_player = prompt_player_choice(target_players)
+
+    #choose property to steal
+    print(message["wanted_card"].format(player=chosen_player.name))
+    wanted_set = prompt_full_set_choice(chosen_player.get_full_sets())
+    
+    #remove full set
+    del chosen_player.property_sets[wanted_set.colour]
+    
+    if wanted_set.colour not in player.property_sets:
+        player.property_sets[wanted_set.colour] = wanted_set 
+        #doenstr handle if you already have a property in this colur
+    
+    
     return True
 
 def handle_double_rent_card(game, player, card):

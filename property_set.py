@@ -16,7 +16,7 @@ class PropertySet:
         self.rent = 0
     
     def __str__(self):
-        status = "✅" if self.is_full else ""
+        status = "✅ " if self.is_full else ""
         card_names = ", ".join(card.name for card in self.cards)
         return (
             f"  {self.colour.name.title()}{status} "

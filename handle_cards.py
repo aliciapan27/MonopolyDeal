@@ -1,6 +1,5 @@
 from property_set import PropertySet
 from enums import PropertyColour, ActionType
-from card import JustSayNoCard
 from card_data import FULL_SET_SIZES
 from messages import ACTION_MESSAGES
 
@@ -179,7 +178,6 @@ def players_with_full_sets(game, player):
             players_with_full_sets.append(other)
 
     return players_with_full_sets
-
 
 #Action card Handlers
 def handle_money_card(game, player, card):

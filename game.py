@@ -39,18 +39,28 @@ class Game:
         player.draw_cards(self.deck, DRAW_TWO)
 
         while player.actions_remaining > 0:
-            chosen_card, card_index = player.choose_card()
+            chosen_card, card_index, money_mode = player.choose_card()
 
             if chosen_card is None:
                 print("Turn ended.")
                 break
-        
-            self.play_card(player, chosen_card, card_index)
+            if not money_mode:
+                self.play_card(player, chosen_card, card_index)
+            else:
+                self.play_as_money(player, chosen_card, card_index)
+
     
     def discard_card(self, player, card):
         if card in player.hand:
             player.hand.remove(card)
         self.discard_pile.append(card)
+    
+    def play_as_money(self, player, card, card_index):
+        success = handle_money_card(self, player, card)
+
+        if success:
+            player.hand.pop(card_index)
+            player.actions_remaining -= 1
         
     def play_card(self, player, card, card_index):
         if isinstance(card, MoneyCard):
@@ -83,7 +93,6 @@ class Game:
             success = False
             print("\nNeed to play rent card first!")
         
-        
         else:
             success = False
             print("\nAction not implemented yet")
@@ -92,6 +101,8 @@ class Game:
         if success:
             player.hand.pop(card_index)
             self.discard_card(player, card) #just say no cards are discarded in handle_cards.py
+
+            #shouldn't discard money or properties, fix this later
             player.actions_remaining -= 1
 
     def check_win_condition(self):

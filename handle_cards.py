@@ -37,6 +37,23 @@ def prompt_player_choice(target_players):
         except ValueError:
             print("Please enter a number.")
 
+def prompt_property_choice(properties):
+    print("\nChoose a property:")
+
+    for i, (colour, prop_set) in enumerate(properties(), start = 1):
+        print(f"{i: } {card.name} ({colour})")
+            
+    while True:
+        try:
+            choice = int(input("Enter the number of your choice: ")) - 1
+            if 0 <= choice < len(all_properties):
+                return all_properties[choice]
+            else:
+                print("Invalid choice. Try again.")
+
+        except ValueError:
+            print("Please enter a number.")
+
 def try_just_say_no(game, attacker, defender):
     message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
     #Check if player has just say no
@@ -55,7 +72,6 @@ def try_just_say_no(game, attacker, defender):
                 else:
                     return True #action blocked successfully
     return False #no just say no played
-
 
 def prompt_payment(game, payer, collector, amount_due):
     message = ACTION_MESSAGES["prompt_payment"]
@@ -235,8 +251,56 @@ def handle_debt_collector_card(game, player, card):
     collect_payment(game, player, chosen_player, DEBT)
     return True
 
-def handle_force_deal_card(game, player, card):   
-    return
+def show_tradeable(player, tradeable_sets):
+    print(f"\n{player.name}:")
+    for colour, prop_set in tradeable_sets:
+        card_names = ", ".join(card.name for card in prop_set.cards)
+        print(f"  {colour}: {card_names}")
+
+def players_with_tradeable(game, player):
+    players_with_tradeables = []
+
+    for other in game.players:
+        if other == player:
+            continue
+
+        tradeable_sets = other.get_tradeable_properties()
+
+        if tradeable_sets:
+            players_with_tradeables.append(other)
+
+
+    return players_with_tradeables
+
+def handle_force_deal_card(game, player, card): 
+    message = ACTION_MESSAGES[ActionType.FORCE_DEAL]
+
+    #player has no properties to trade
+    if not player.property_sets:
+        print(message["fail1"].format(player = player.name))
+        return False
+    
+    target_players =  players_with_tradeable(game, player)
+
+    #no other players have properties to trade
+    if not target_players:
+        print(message["fail2"].format(player = player.name))
+        return False
+
+    print(message["intro"].format(player = player.name))
+    
+    #show everyone's properties
+    for other in target_players:
+        show_tradeable(other, other.get_tradeable_properties())
+    
+    #choose player to trade with
+    chosen_player = prompt_player_choice(target_players)
+
+    #choose property to trade with
+    their_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+
+    print(their_card.name)
+    return True
 
 def handle_sly_deal_card(game, player, card):
     return

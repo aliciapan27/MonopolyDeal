@@ -7,8 +7,6 @@ class Player:
         self.bank = []
 
         self.property_sets = {}
-        self.full_sets = []
-
         self.actions_remaining = 3 #reset each turn
 
     def __str__(self):
@@ -74,6 +72,12 @@ class Player:
             for card in drawn_cards:
                 print(f"- {card}")
 
-
+    def get_tradeable_properties(self):
+        tradeables = []
+        for color, prop_set in self.property_sets.items():
+            if not prop_set.is_full:
+                tradeables.append(prop_set)
+        return tradeables
+       
 
     

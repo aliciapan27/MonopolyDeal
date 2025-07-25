@@ -86,6 +86,8 @@ def create_test_hand1():
 
 def create_test_hand2():
     return [
+        ForceDealCard(2),
+        WildCard([PropertyColour.GREEN, PropertyColour.DARK_BLUE], 4),
         JustSayNoCard(4),
         DebtCollectorCard(3),
         BirthdayCard(2),

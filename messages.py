@@ -22,6 +22,11 @@ ACTION_MESSAGES = {
         "success": "\n{target} pays {player} $5M.",
         "fail": "\n{target} has no money to pay."
     },
+    ActionType.FORCE_DEAL: {
+        "intro": "\n🔁  Forced Deal! {player}, force a player to swap properties with you.",
+        "fail1": "\nYou have no properties to trade.",
+        "fail2": "\nNo other players have tradeable properties."
+    },
     ActionType.RENT: {
         "colour_intro": "\n💸 Time to pay rent! {player}, choose a colour property.",
         "colour_collect": "\nEveryone pays {player} ${rent}M for {colour} properties!",
@@ -39,9 +44,7 @@ ACTION_MESSAGES = {
     ActionType.DOUBLE_RENT: {
         "intro": "\n🚨💰 {player} doubled the rent!"
     },
-    ActionType.FORCE_DEAL: {
-        "intro": "❌ \n{player} played Just Say No!"
-    },
+    
     "prompt_payment": {
         "prompt": "\n{payer}, you owe ${amount_due}M.",
         "not_enough": "{payer} doesn't have enough money to pay the full amount.",

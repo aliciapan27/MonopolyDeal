@@ -40,14 +40,14 @@ def prompt_player_choice(target_players):
 def prompt_property_choice(properties):
     print("\nChoose a property:")
 
-    for i, (colour, prop_set) in enumerate(properties(), start = 1):
-        print(f"{i: } {card.name} ({colour})")
+    for i, property in enumerate(properties, start = 1):
+        print(f"{i: } {property.name} ({property.colour})")
             
     while True:
         try:
             choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= choice < len(all_properties):
-                return all_properties[choice]
+            if 0 <= choice < len(properties):
+                return properties[choice]
             else:
                 print("Invalid choice. Try again.")
 
@@ -269,7 +269,6 @@ def players_with_tradeable(game, player):
         if tradeable_sets:
             players_with_tradeables.append(other)
 
-
     return players_with_tradeables
 
 def handle_force_deal_card(game, player, card): 
@@ -290,8 +289,8 @@ def handle_force_deal_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     #show everyone's properties
-    for other in target_players:
-        show_tradeable(other, other.get_tradeable_properties())
+    # for other in target_players:
+    #     show_tradeable(other, other.get_tradeable_properties())
     
     #choose player to trade with
     chosen_player = prompt_player_choice(target_players)

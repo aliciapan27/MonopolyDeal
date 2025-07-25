@@ -14,6 +14,15 @@ class PropertySet:
         self.hotel_count = 0
        
         self.rent = 0
+    
+    def __str__(self):
+        status = "✅" if self.is_full else ""
+        card_names = ", ".join(card.name for card in self.cards)
+        return (
+            f"  {self.colour.name.title()}{status} "
+            f"(🏠 {self.house_count}, 🏨 {self.hotel_count}, 💰 {self.rent}): "
+            f"{card_names}"
+        )
 
     def check_if_full(self):
         return len(self.cards) >= self.required_size

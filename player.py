@@ -11,18 +11,10 @@ class Player:
 
     def __str__(self):
         bank_str = ', '.join(card.name for card in self.bank)
-        
+    
         property_sets_str = "\n".join(
-            f"  {colour.name.title()}{' ✅' if cards.is_full else ''}: {', '.join(card.name for card in cards.cards)}"
-            for colour, cards in self.property_sets.items()
-        )
-
-        property_sets_str = "\n".join(
-            f"  {colour.name.title()}{' ✅' if prop_set.is_full else ''} "
-            f"(🏠 {prop_set.house_count}, 🏨 {prop_set.hotel_count}, 💰 {prop_set.rent}): "
-            f"{', '.join(card.name for card in prop_set.cards)}"
-            for colour, prop_set in self.property_sets.items()
-        )
+            str(prop_set) for prop_set in self.property_sets.values()
+        ) 
 
         return (
             f"Player: {self.name}\n"
@@ -74,10 +66,7 @@ class Player:
 
     def get_tradeable_properties(self):
         tradeables = []
-        for color, prop_set in self.property_sets.items():
+        for prop_set in self.property_sets.values():
             if not prop_set.is_full:
-                tradeables.append(prop_set)
+                tradeables.extend(prop_set.cards)
         return tradeables
-       
-
-    

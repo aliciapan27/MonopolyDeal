@@ -32,16 +32,17 @@ ACTION_MESSAGES = {
         "double": "\nYou have a Double the Rent card! Do you want to use it? (Y/N)"
     },
     ActionType.JUST_SAY_NO: {
-        "intro": "❌ \n{player} played Just Say No!"
+        "intro": "\n❌ {player} played Just Say No!",
+        "use_just_say_no": "\n{player}, you have a Just Say No! Do you want to use it? (Y/N)",
+        "counter_no": "\n{collector}, you have a Just Say No! Do you want to counter {payer}'s Just Say No? (Y/N)"
     },
     ActionType.DOUBLE_RENT: {
-        "intro": "🚨💰 \n{player} doubled the rent!"
+        "intro": "\n🚨💰 {player} doubled the rent!"
     },
     ActionType.FORCE_DEAL: {
         "intro": "❌ \n{player} played Just Say No!"
     },
     "prompt_payment": {
-        "use_just_say_no": "\nYou have a Just Say No! Do you want to use it? (Y/N)",
         "prompt": "\n{payer}, you owe ${amount_due}M.",
         "not_enough": "{payer} doesn't have enough money to pay the full amount.",
         "no_money": "{payer} has no more money in their bank."

@@ -37,16 +37,30 @@ def prompt_player_choice(target_players):
         except ValueError:
             print("Please enter a number.")
 
-def prompt_payment(game, payer, amount_due):
-    message = ACTION_MESSAGES["prompt_payment"]
+def try_just_say_no(game, attacker, defender):
+    message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
     #Check if player has just say no
-    for card in payer.hand:
+    for card in defender.hand:
         if card.action_type == ActionType.JUST_SAY_NO:
-            response = input(message["use_just_say_no"] + " ").strip().lower()
+            response = input(message["use_just_say_no"].format(player = defender.name) + " ").strip().lower()
             
             if response == "y":
-                handle_just_say_no_card(game, payer, card)
-            break
+                #print(message["intro"].format(player = defender.name))
+                handle_just_say_no_card(game, defender, card)
+
+                #Check if attacker has a just say no to play
+                if try_just_say_no(game, defender, attacker):
+                    print(f"{attacker.name}'s Just Say No cancels {defender.name}'s Just Say No.")
+                    return False #original just say no blocked
+                else:
+                    return True #action blocked successfully
+    return False #no just say no played
+
+
+def prompt_payment(game, payer, collector, amount_due):
+    message = ACTION_MESSAGES["prompt_payment"]
+    if try_just_say_no(game, collector, payer):
+        return None
 
     print(message["prompt"].format(payer=payer.name, amount_due = amount_due))
     print("Your bank:")
@@ -96,7 +110,12 @@ def collect_payment(game, collector, payer, amount):
             print(f"{payer.name} has no money to pay.")
             return False
 
-        cards_given = prompt_payment(game, payer, amount)
+        cards_given = prompt_payment(game, payer, collector, amount)
+
+        if cards_given is None:
+            print(f"{payer.name} used 'Just Say No' to block the payment.")
+            return False
+        
         collector.bank.extend(cards_given)
         return True
 
@@ -232,6 +251,8 @@ def handle_rent_card(game, player, card):
         print(message["colour_intro"].format(player = player.name))
         chosen_colour = prompt_colour_choice(valid_colours)
 
+        rent = player.property_sets[chosen_colour].rent
+
         #Check if player has double rent card
         for card in player.hand:
             if card.action_type == ActionType.DOUBLE_RENT and player.actions_remaining > 1:
@@ -239,9 +260,7 @@ def handle_rent_card(game, player, card):
                 
                 if response == "y":
                     handle_double_rent_card(game, player, card)
-                    rent = 2*player.property_sets[chosen_colour].rent 
-                else:
-                    rent = player.property_sets[chosen_colour].rent
+                    rent *= 2
         
         print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
     
@@ -257,6 +276,8 @@ def handle_rent_card(game, player, card):
         print(message["any_intro"].format(player = player.name))
         chosen_colour = prompt_colour_choice(valid_colours)
 
+        rent = player.property_sets[chosen_colour].rent
+
         #Check if player has double rent card
         for card in player.hand:
             if card.action_type == ActionType.DOUBLE_RENT and player.actions_remaining > 1:
@@ -264,10 +285,7 @@ def handle_rent_card(game, player, card):
                 
                 if response == "y":
                     handle_double_rent_card(game, player, card)
-                    rent = 2*player.property_sets[chosen_colour].rent 
-                else:
-                    rent = player.property_sets[chosen_colour].rent
-        print(message["colour_collect"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
+                    rent *= 2
     
         #Choose player
         print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
@@ -280,7 +298,8 @@ def handle_rent_card(game, player, card):
 def handle_just_say_no_card(game, player, card):
     message = ACTION_MESSAGES[ActionType.JUST_SAY_NO]
     print(message["intro"].format(player = player.name))
-    
+    #discard card
+    game.discard_card(player, card)
     return True
 
 def handle_deal_breaker_card(game, player, card):

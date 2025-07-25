@@ -91,7 +91,7 @@ class Game:
         #pop from hand
         if success:
             player.hand.pop(card_index)
-            self.discard_card(player, card)
+            self.discard_card(player, card) #just say no cards are discarded in handle_cards.py
             player.actions_remaining -= 1
 
     def check_win_condition(self):

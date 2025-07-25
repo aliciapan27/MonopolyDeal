@@ -79,6 +79,7 @@ def create_test_hand1():
         DoubleRentCard(1),
         HouseCard(3),
         BirthdayCard(2),
+        JustSayNoCard(4),
         MoneyCard(1),
         MoneyCard(2)
     ]

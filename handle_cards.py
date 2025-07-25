@@ -41,7 +41,7 @@ def prompt_property_choice(properties):
     print("\nChoose a property:")
 
     for i, property in enumerate(properties, start = 1):
-        print(f"{i: } {property.name} ({property.colour})")
+        print(f"{i}: {property.name} ({property.colour.name.title()})")
             
     while True:
         try:
@@ -156,7 +156,10 @@ def handle_wildcard(game, player, card):
     else:
         valid_colours = card.colours
         chosen_colour = prompt_colour_choice(valid_colours)
-            
+    
+    #set wildcard colour
+    card.colour = chosen_colour
+    
     # Add property to dictionary
     if chosen_colour not in player.property_sets:
         player.property_sets[chosen_colour] = PropertySet(chosen_colour, FULL_SET_SIZES.get(chosen_colour, float('inf')))
@@ -251,12 +254,6 @@ def handle_debt_collector_card(game, player, card):
     collect_payment(game, player, chosen_player, DEBT)
     return True
 
-def show_tradeable(player, tradeable_sets):
-    print(f"\n{player.name}:")
-    for colour, prop_set in tradeable_sets:
-        card_names = ", ".join(card.name for card in prop_set.cards)
-        print(f"  {colour}: {card_names}")
-
 def players_with_tradeable(game, player):
     players_with_tradeables = []
 
@@ -288,17 +285,29 @@ def handle_force_deal_card(game, player, card):
 
     print(message["intro"].format(player = player.name))
     
-    #show everyone's properties
-    # for other in target_players:
-    #     show_tradeable(other, other.get_tradeable_properties())
-    
     #choose player to trade with
     chosen_player = prompt_player_choice(target_players)
 
     #choose property to trade with
-    their_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+    print(message["wanted_card"].format(player=chosen_player.name))
+    wanted_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+    
+    print(message["your_card"])
+    card_to_swap = prompt_property_choice(player.get_tradeable_properties())
+    
+    #remove cards from set
+    chosen_player.property_sets[wanted_card.colour].remove_card(wanted_card)
+    player.property_sets[card_to_swap.colour].remove_card(card_to_swap)
 
-    print(their_card.name)
+    #add cards to new sets
+    if card_to_swap.colour not in chosen_player.property_sets:
+        chosen_player.property_sets[card_to_swap.colour] = PropertySet(card_to_swap.colour, FULL_SET_SIZES.get(card_to_swap.colour, float('inf')))
+    chosen_player.property_sets[card_to_swap.colour].add_card(card_to_swap)
+
+    if wanted_card.colour not in player.property_sets:
+        player.property_sets[wanted_card.colour] = PropertySet(wanted_card.colour, FULL_SET_SIZES.get(wanted_card.colour, float('inf')))
+    player.property_sets[wanted_card.colour].add_card(wanted_card)
+
     return True
 
 def handle_sly_deal_card(game, player, card):

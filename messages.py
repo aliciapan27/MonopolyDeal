@@ -25,7 +25,9 @@ ACTION_MESSAGES = {
     ActionType.FORCE_DEAL: {
         "intro": "\n🔁  Forced Deal! {player}, force a player to swap properties with you.",
         "fail1": "\nYou have no properties to trade.",
-        "fail2": "\nNo other players have tradeable properties."
+        "fail2": "\nNo other players have tradeable properties.",
+        "wanted_card": "\nWhich one of {player}'s properties do you want?",
+        "your_card": "Which one of your properties do you want to swap?"
     },
     ActionType.RENT: {
         "colour_intro": "\n💸 Time to pay rent! {player}, choose a colour property.",

@@ -13,7 +13,7 @@ class Player:
         bank_str = ', '.join(card.name for card in self.bank)
     
         property_sets_str = "\n".join(
-            str(prop_set) for prop_set in self.property_sets.values()
+            str(prop_set) for prop_set in self.property_sets.values() if prop_set.cards
         ) 
 
         return (

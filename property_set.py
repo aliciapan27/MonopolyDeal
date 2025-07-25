@@ -32,6 +32,11 @@ class PropertySet:
         self.is_full = self.check_if_full()
         self.update_rent()
     
+    def remove_card(self, card):
+        self.cards.remove(card)
+        self.is_full = self.check_if_full()
+        self.update_rent()
+    
     def add_house(self):
         self.house_count += 1
         
@@ -41,6 +46,7 @@ class PropertySet:
 
     def update_rent(self):
         if not self.cards:
+            self.rent = 0
             return
         
         rent_table = PROPERTY_RENT[self.colour]

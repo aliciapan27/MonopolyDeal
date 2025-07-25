@@ -29,6 +29,7 @@ class WildCard(Card):
         name = f"{'/'.join(colour.name.replace('_', ' ').title() for colour in colours)} Wildcard"
         super().__init__(name, CardType.PROPERTY, value)
         self.colours = colours
+        self.colour = None #not set yet
 
 # Action cards
 class HouseCard(Card):

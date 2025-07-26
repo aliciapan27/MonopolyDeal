@@ -1,4 +1,4 @@
-from enums import ActionType
+from game_logic.enums import ActionType
 
 ACTION_MESSAGES = {
     ActionType.HOUSE: {

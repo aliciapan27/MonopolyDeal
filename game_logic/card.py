@@ -1,4 +1,4 @@
-from enums import CardType, ActionType
+from game_logic.enums import CardType, ActionType
 
 class Card:
     def __init__(self, name: str, card_type: CardType, value: int = 0, action_type = None):

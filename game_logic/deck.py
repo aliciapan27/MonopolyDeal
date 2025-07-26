@@ -1,6 +1,6 @@
-from card import *
-from enums import CardType
-from card_data import *
+from game_logic.card import *
+from game_logic.enums import CardType
+from game_logic.card_data import *
 import random
 
 def create_money_cards():

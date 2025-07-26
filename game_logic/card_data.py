@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from enums import PropertyColour
-from card import *
+from game_logic.enums import PropertyColour
+from game_logic.card import *
 
 @dataclass
 class PropertyCardInfo:

@@ -1,6 +1,6 @@
-from deck import create_deck, shuffle_deck, create_test_deck
-from card import *
-from handle_cards import *
+from game_logic.deck import create_deck, shuffle_deck, create_test_deck
+from game_logic.card import *
+from game_logic.handle_cards import *
 
 STARTING_HAND = 5
 DRAW_TWO = 2

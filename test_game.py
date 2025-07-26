@@ -1,6 +1,6 @@
-from game import Game
-from player import Player
-from deck import create_test_hand1, create_test_hand2
+from game_logic.game import Game
+from game_logic.player import Player
+from game_logic.deck import create_test_hand1, create_test_hand2
 
 def main():
     

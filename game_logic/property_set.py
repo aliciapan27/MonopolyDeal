@@ -1,4 +1,4 @@
-from card_data import PROPERTY_RENT
+from game_logic.card_data import PROPERTY_RENT
 
 HOUSE_RENT = 3
 HOTEL_RENT = 4

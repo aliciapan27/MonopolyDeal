@@ -1,7 +1,7 @@
-from property_set import PropertySet
-from enums import PropertyColour, ActionType
-from card_data import FULL_SET_SIZES
-from messages import ACTION_MESSAGES
+from game_logic.property_set import PropertySet
+from game_logic.enums import PropertyColour, ActionType
+from game_logic.card_data import FULL_SET_SIZES
+from game_logic.messages import ACTION_MESSAGES
 
 BDAY_DEBT = 2
 DEBT = 5

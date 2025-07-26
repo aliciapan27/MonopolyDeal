@@ -15,8 +15,8 @@ def main():
     game.start()
 
     #give test hands
-    alicia.hand = create_test_hand1()
-    james.hand = create_test_hand2()
+    # alicia.hand = create_test_hand1()
+    # james.hand = create_test_hand2()
 
     #game loop
     current_player_index = 0

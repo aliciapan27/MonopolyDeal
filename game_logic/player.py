@@ -29,6 +29,13 @@ class Player:
         for i, card in enumerate(self.hand, start=1):
             print(f"{i}: ", card)
 
+    #for server
+    def get_hand_string(self):
+        hand_str = "\nYour hand:\n"
+        for i, card in enumerate(self.hand, start=1):
+            hand_st += f"{i}: {card}\n"
+        return hand_st
+
     def choose_card(self):
         money_mode = False
 

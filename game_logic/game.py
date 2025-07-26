@@ -1,4 +1,4 @@
-from game_logic.deck import create_deck, shuffle_deck, create_test_deck
+from game_logic.deck import create_deck, shuffle_deck
 from game_logic.card import *
 from game_logic.handle_cards import *
 
@@ -19,12 +19,8 @@ class Game:
         shuffle_deck(self.deck)
 
         # Deal 5 cards to each player
-
-        if self.test_mode:
-            self.players.hand = create_test_deck
-        else:
-            for player in self.players:
-                player.draw_cards(self.deck, STARTING_HAND)
+        for player in self.players:
+            player.draw_cards(self.deck, STARTING_HAND)
 
     def game_loop(self):
         while not self.check_win_condition():

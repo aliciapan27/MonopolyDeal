@@ -62,3 +62,4 @@ ACTION_MESSAGES = {
         "no_money": "{payer} has no more money in their bank."
     }
 }
+

@@ -4,48 +4,113 @@ from game_logic.handle_cards import *
 
 STARTING_HAND = 5
 DRAW_TWO = 2
-RESET_ACTIONS = 3
+STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, test_mode=False):
+    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, set_active_player_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
-        self.test_mode = test_mode
+
+        self.running = True
+        self.turn_index = 0
+
+        self.send_message = send_message_func
+        self.broadcast = broadcast_func
+        self.prompt_player = prompt_player_func
+        self.set_active_player = set_active_player_func
 
         self.deck = create_deck()
 
+    def msg_drawn_cards(self, player, cards):
+        if cards:
+            message = "You drew:\n" + "\n".join(f"- {card}" for card in cards)
+        else:
+            message = "Deck is empty! You couldn't draw any cards."
+
+        self.send_message(message, player)
+
     def start(self):
         shuffle_deck(self.deck)
+        self.broadcast("🎮 Game starting with two players!\n")
 
         # Deal 5 cards to each player
         for player in self.players:
             player.draw_cards(self.deck, STARTING_HAND)
+            self.send_message(player.get_hand_string(), player)
+        self.game_loop()
 
     def game_loop(self):
-        while not self.check_win_condition():
-            current_player = self.players[self.current_player_index]
-            print(f"{current_player.name}'s turn")
+        while self.running:
+            current_player = self.players[self.turn_index]
+            self.set_active_player(current_player)
+            
+            self.broadcast(f"\n🟢 {current_player.name}'s turn")
+
             self.take_turn(current_player)
-            self.current_player_index = (self.current_player_index + 1) % len(self.players)
+
+            # Check win condition here (placeholder)
+            if len(current_player.property_sets) >= 3:
+                self.send_all(f"🏆 {current_player.name} wins!")
+                self.running = False
+                break
+
+            self.turn_index = (self.turn_index + 1) % len(self.players)
 
     def take_turn(self, player):
-        print(f"\nCURRENT\n{player}")
-        player.actions_remaining = 3
-        player.draw_cards(self.deck, DRAW_TWO)
+        player.actions_remaining = STARTING_ACTIONS
 
+        #Draw 2 cards to begin
+        drawn_cards = player.draw_cards(self.deck, DRAW_TWO)
+        self.msg_drawn_cards(player, drawn_cards)
+
+        #player chooses card to play
         while player.actions_remaining > 0:
-            chosen_card, card_index, money_mode = player.choose_card()
+            chosen_card, card_index, money_mode = self.choose_card(player)
 
             if chosen_card is None:
-                print("Turn ended.")
+                #print("Turn ended.")
+                self.broadcast(f"\n{player.name} ended their turn.")
+                
                 break
             if not money_mode:
                 self.play_card(player, chosen_card, card_index)
             else:
                 self.play_as_money(player, chosen_card, card_index)
-
     
+    def choose_card(self):
+        money_mode = False
+
+        print(f"\n{self}")
+        while True:
+            self.print_hand()
+
+            #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
+            choice = input(
+                "Choose an option:\n"
+                "  - Enter the number of the card to play\n"
+                "  -  Enter 'm' to switch to money mode (card will be played as money)\n"
+                "  - Enter 'x' to end turn early\n"
+                "Your choice: "
+            ).strip().lower()
+            
+            if choice.lower() == 'x':
+                return None, None, False
+
+            if choice.lower() == 'm':
+                print("Money mode activated: your next chosen card will be played as money.")
+                money_mode = True
+                continue
+
+            if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
+                print("Invalid choice. Try again.")
+                continue
+
+            card_index = int(choice)-1
+            chosen_card = self.hand[card_index]
+            print(f"\nYou chose {chosen_card.name}")
+            return chosen_card, card_index, money_mode
+        
     def discard_card(self, player, card):
         if card in player.hand:
             player.hand.remove(card)
@@ -100,10 +165,3 @@ class Game:
 
             #shouldn't discard money or properties, fix this later
             player.actions_remaining -= 1
-
-    def check_win_condition(self):
-        for player in self.players:
-            if player.has_won():
-                print(f"{player.name} wins!")
-                return True
-        return False

@@ -13,12 +13,24 @@ from game_logic.player import Player
 HOST = 'localhost'
 PORT = 5555
 
-turn_index = 0
 game = None
 players = []  # [(conn, name)]  eg) [(conn1, "Alicia"), (conn2, "James")]
 player_objs = []
 conn_map = {}
 lock = threading.Lock()
+
+active_player = None
+
+def set_active_player(player):
+    global active_player
+    active_player = player
+
+def broadcast(message):
+    for conn, _ in players:
+        try:
+            conn.sendall(message.encode())
+        except:
+            pass
 
 def send_message(message: str, player):
     conn = conn_map.get(player.name)
@@ -28,6 +40,10 @@ def send_message(message: str, player):
         except:
             print(f"[ERROR] Failed to send message to {player.name}")
 
+
+def prompt_player(player, prompt):
+    send_message(player, prompt)
+    return conn_map[player.name].recv(1024).decode().strip()
 
 def handle_client(conn, addr):
     global turn_index, game
@@ -46,13 +62,8 @@ def handle_client(conn, addr):
 
         if len(players) == 2:
             print("[GAME READY] Two players connected.")
-            game = Game(player_objs)
+            game = Game(player_objs, send_message, broadcast, prompt_player, set_active_player)
             game.start()
-
-            broadcast("🎮 Game starting with two players!\n")
-            broadcast(f"🟢 {players[turn_index][1]}'s turn\n")
-
-            send_message(player.get_hand_string(), player)
 
     while True:
         try:
@@ -65,28 +76,14 @@ def handle_client(conn, addr):
                 break
 
             with lock:
-                current_conn, current_name = players[turn_index]
-
-                #PLAYER
-                if conn == current_conn:
-                    player_obj = player_objs[turn_index]
-
-                    broadcast(f"{name}: {msg}\n")
-                    turn_index = (turn_index + 1) % 2
-                    broadcast(f"🟢 {players[turn_index][1]}'s turn\n")
-                else:
+                if player != active_player:
                     conn.sendall("⛔ Not your turn!\n".encode())
+                else:
+                    pass
         except:
             break
 
     conn.close()
-
-def broadcast(message):
-    for conn, _ in players:
-        try:
-            conn.sendall(message.encode())
-        except:
-            pass
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

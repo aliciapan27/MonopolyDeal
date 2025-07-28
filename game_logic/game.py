@@ -106,7 +106,7 @@ class Game:
                 return None, None, False
 
             if choice.lower() == 'm':
-                self.send_message("Money mode activated: your next chosen card will be played as money.", player)
+                print("Money mode activated: your next chosen card will be played as money.")
                 money_mode = True
                 continue
 
@@ -115,8 +115,8 @@ class Game:
                 continue
 
             card_index = int(choice)-1
-            chosen_card = player.hand[card_index]
-            self.send_message(f"\nYou chose {chosen_card.name}", player)
+            chosen_card = self.hand[card_index]
+            print(f"\nYou chose {chosen_card.name}")
             return chosen_card, card_index, money_mode
         
     def discard_card(self, player, card):

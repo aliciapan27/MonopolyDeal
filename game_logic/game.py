@@ -2,24 +2,27 @@ from game_logic.deck import create_deck, shuffle_deck
 from game_logic.card import *
 from game_logic.handle_cards import *
 
+import threading
+
 STARTING_HAND = 5
 DRAW_TWO = 2
 STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, set_active_player_func, end_game_func):
+    def __init__(self, players, shutdown_event, send_message_func, broadcast_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
 
-        self.running = True
-        self.turn_index = 0
+        self.game_over = False
+        self.curr_turn = 0
 
+        self.shutdown_event = shutdown_event
         self.send_message = send_message_func
         self.broadcast = broadcast_func
-        self.prompt_player = prompt_player_func
-        self.set_active_player = set_active_player_func
-        self.end_game = end_game_func
+        # self.prompt_player = prompt_player_func
+        # self.set_active_player = set_active_player_func
+        # self.end_game = end_game_func
 
         self.deck = create_deck()
 
@@ -38,22 +41,24 @@ class Game:
         # Deal 5 cards to each player
         for player in self.players:
             player.draw_cards(self.deck, STARTING_HAND)
-            self.send_message(player.get_hand_string(), player)
-        self.game_loop()
+            self.send_message(player, player.get_hand_string())
+
+        print("[GAME] Sent initial hands to all players.\n")
+        #self.game_loop()
+        threading.Thread(target=self.game_loop, daemon=True).start()
 
     def game_loop(self):
-        while self.running:
-            current_player = self.players[self.turn_index]
-            self.set_active_player(current_player)
-            
+        while not self.shutdown_event.is_set() and not self.game_over:
+            current_player = self.players[self.curr_turn]
+            self.send_message(current_player, "Your turn!\n")
             self.broadcast(f"\n🟢 {current_player.name}'s turn\n")
 
             self.take_turn(current_player)
 
-            if not self.running:
-                return
-            
-            self.turn_index = (self.turn_index + 1) % len(self.players)
+            if self.game_over or self.shut_down_event.is_set():
+                break
+
+            self.curr_turn = (self.curr_turn + 1) % len(self.players)
 
     def take_turn(self, player):
         player.actions_remaining = STARTING_ACTIONS
@@ -62,14 +67,23 @@ class Game:
         drawn_cards = player.draw_cards(self.deck, DRAW_TWO)
         self.msg_drawn_cards(player, drawn_cards)
 
-        self.send_message(player.get_hand_string(), player)
+        self.send_message(player, player.get_hand_string())
 
-        choice = self.prompt_player("Enter 'q' to quit: ", player).strip().lower()
+        self.send_message(player, "Enter 'q' to quit or 'x' to end your turn early.")
 
-        if choice == 'q':
-            print(f"[QUIT] {player.name} quit the game.")
-            self.end_game(f"{player.name} quit the game.")
-            return None, None, None
+        import time
+        time.sleep(2)  # Simulate player thinking
+
+        # Example quit shortcut
+        if self.shut_down_event.is_set():
+            return
+    
+        # choice = self.prompt_player("Enter 'q' to quit: ", player).strip().lower()
+
+        # if choice == 'q':
+        #     print(f"[QUIT] {player.name} quit the game.")
+        #     self.end_game(f"{player.name} quit the game.")
+        #     return None, None, None
 
         #player chooses card to play
         # while player.actions_remaining > 0 and self.running:

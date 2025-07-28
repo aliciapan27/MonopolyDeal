@@ -16,21 +16,23 @@ player_objs = []
 conn_to_player = {}
 shutdown_event = threading.Event()
 
-def send_message(conn, message):
+game = None
+
+def send_message(player, message):
     try:
-        conn.send(message.encode())
+        player.conn.send(message.encode())
     except Exception as e:
         print(f"[ERROR] Failed to send to client: {e}")
 
 def broadcast(message):
     print(f"[BROADCAST] {message}")
-    for conn, _ in players:
-        send_message(conn, message)
+    for player in player_objs:
+        send_message(player, message)
 
 def handle_client(conn, addr, name):
     player = conn_to_player[conn]
     print(f"[NEW CONNECTION] {name} ({addr}) connected.")
-    send_message(conn, f"Welcome {player.name}!")
+    send_message(player, f"Welcome {player.name}!")
     broadcast(f"{player.name} has joined the game.")
 
     while not shutdown_event.is_set():
@@ -69,7 +71,7 @@ def start_server():
                 name = f"Player{len(players) + 1}"
 
                 # Create Player object
-                player = Player(name)
+                player = Player(name, conn)
                 player_objs.append(player)
                 conn_to_player[conn] = player
 
@@ -77,6 +79,10 @@ def start_server():
 
                 thread = threading.Thread(target=handle_client, args=(conn, addr, name))
                 thread.start()
+
+                if len(players) == MAX_PLAYERS:
+                    start_game()
+
             except socket.timeout:
                 continue
     finally:
@@ -88,6 +94,16 @@ def start_server():
             except:
                 pass
         server.close()
+
+def start_game():
+    global game
+    print("[GAME] Starting the game with players:")
+    for p in player_objs:
+        print(f" - {p.name}")
+
+    game = Game(player_objs, shutdown_event, send_message, broadcast)
+    broadcast("All players connected.\n")
+    game.start() 
 
 if __name__ == "__main__":
     start_server()

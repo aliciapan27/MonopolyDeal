@@ -1,13 +1,15 @@
 RESET_ACTIONS = 3
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name, conn = None):
         self.name = name
         self.hand = []
         self.bank = []
 
         self.property_sets = {}
         self.actions_remaining = 3 #reset each turn
+
+        self.conn = conn
 
     def __str__(self):
         bank_str = ', '.join(f"${card.value}M" for card in self.bank)

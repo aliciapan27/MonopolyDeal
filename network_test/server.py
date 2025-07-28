@@ -12,6 +12,8 @@ PORT = 5555
 MAX_PLAYERS = 2
 
 players = []  # List of (conn, name)
+player_objs = []
+conn_to_player = {}
 shutdown_event = threading.Event()
 
 def send_message(conn, message):
@@ -26,9 +28,10 @@ def broadcast(message):
         send_message(conn, message)
 
 def handle_client(conn, addr, name):
+    player = conn_to_player[conn]
     print(f"[NEW CONNECTION] {name} ({addr}) connected.")
-    send_message(conn, f"Welcome {name}!")
-    broadcast(f"{name} has joined the game.")
+    send_message(conn, f"Welcome {player.name}!")
+    broadcast(f"{player.name} has joined the game.")
 
     while not shutdown_event.is_set():
         try:
@@ -64,7 +67,14 @@ def start_server():
             try:
                 conn, addr = server.accept()
                 name = f"Player{len(players) + 1}"
+
+                # Create Player object
+                player = Player(name)
+                player_objs.append(player)
+                conn_to_player[conn] = player
+
                 players.append((conn, name))
+
                 thread = threading.Thread(target=handle_client, args=(conn, addr, name))
                 thread.start()
             except socket.timeout:

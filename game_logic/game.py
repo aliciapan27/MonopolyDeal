@@ -86,58 +86,37 @@ class Game:
         #     else:
         #         self.play_as_money(player, chosen_card, card_index)
     
-    def choose_card(self, player):
-        choice = self.prompt_player("Enter 'q' to quit: ", player)
-
-        choice = choice.strip().lower()
-
-        if choice == 'q':
-            print(f"[QUIT] {player.name} quit the game.")
-            self.end_game(f"{player.name} quit the game.")
-            return None, None, None
-
-        self.send_message("Only 'q' is supported in this test version.\n", player)
-        return None, None, None
-
-
-    def choose_card2(self, player):
+    def choose_card(self):
         money_mode = False
 
         print(f"\n{self}")
         while True:
-            choice_msg = (
+            self.print_hand()
+
+            #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
+            choice = input(
                 "Choose an option:\n"
                 "  - Enter the number of the card to play\n"
                 "  - Enter 'm' to switch to money mode (card will be played as money)\n"
                 "  - Enter 'x' to end turn early\n"
                 "Your choice: "
-            )
-
-
-            choice = self.prompt_player(choice_msg, player)
-            
-            print(f"[DEBUG] Player {player.name} entered: '{choice}'")  # Debug line
-
-            if choice is None:
-                return None, None, None  
-            
-            choice = choice.strip().lower()
+            ).strip().lower()
             
             if choice.lower() == 'x':
                 return None, None, False
 
             if choice.lower() == 'm':
-                print("Money mode activated: your next chosen card will be played as money.")
+                self.send_message("Money mode activated: your next chosen card will be played as money.", player)
                 money_mode = True
                 continue
 
-            if not choice.isdigit() or (int(choice)-1) not in range(len(player.hand)):
+            if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
                 print("Invalid choice. Try again.")
                 continue
 
             card_index = int(choice)-1
-            chosen_card = self.hand[card_index]
-            print(f"\nYou chose {chosen_card.name}")
+            chosen_card = player.hand[card_index]
+            self.send_message(f"\nYou chose {chosen_card.name}", player)
             return chosen_card, card_index, money_mode
         
     def discard_card(self, player, card):

@@ -44,7 +44,7 @@ class Game:
         while self.running:
             current_player = self.players[self.turn_index]
             self.set_active_player(current_player)
-
+            
             self.broadcast(f"\n🟢 {current_player.name}'s turn")
 
             self.take_turn(current_player)
@@ -78,38 +78,37 @@ class Game:
             else:
                 self.play_as_money(player, chosen_card, card_index)
     
-    def choose_card(self, player):
+    def choose_card(self):
         money_mode = False
 
         print(f"\n{self}")
         while True:
-            self.send_message(player.get_hand_string(), player)
+            self.print_hand()
 
             #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
-            choice = self.prompt_player(
+            choice = input(
                 "Choose an option:\n"
                 "  - Enter the number of the card to play\n"
                 "  -  Enter 'm' to switch to money mode (card will be played as money)\n"
                 "  - Enter 'x' to end turn early\n"
-                "Your choice: ",
-                player
+                "Your choice: "
             ).strip().lower()
             
             if choice.lower() == 'x':
                 return None, None, False
 
             if choice.lower() == 'm':
-                self.send_message("Money mode activated: your next chosen card will be played as money.", player)
+                print("Money mode activated: your next chosen card will be played as money.")
                 money_mode = True
                 continue
 
             if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
-                self.send_message("Invalid choice. Try again.", player)
+                print("Invalid choice. Try again.")
                 continue
 
             card_index = int(choice)-1
-            chosen_card = player.hand[card_index]
-            self.send_message(f"\nYou chose {chosen_card.name}", player)
+            chosen_card = self.hand[card_index]
+            print(f"\nYou chose {chosen_card.name}")
             return chosen_card, card_index, money_mode
         
     def discard_card(self, player, card):

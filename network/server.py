@@ -41,8 +41,8 @@ def send_message(message: str, player):
             print(f"[ERROR] Failed to send message to {player.name}")
 
 
-def prompt_player(prompt, player):
-    send_message(prompt, player)
+def prompt_player(player, prompt):
+    send_message(player, prompt)
     return conn_map[player.name].recv(1024).decode().strip()
 
 def handle_client(conn, addr):

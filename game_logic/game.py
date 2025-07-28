@@ -7,7 +7,7 @@ DRAW_TWO = 2
 STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, set_active_player_func):
+    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, set_active_player_func, end_game_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
@@ -19,6 +19,7 @@ class Game:
         self.broadcast = broadcast_func
         self.prompt_player = prompt_player_func
         self.set_active_player = set_active_player_func
+        self.end_game = end_game_func
 
         self.deck = create_deck()
 
@@ -45,16 +46,13 @@ class Game:
             current_player = self.players[self.turn_index]
             self.set_active_player(current_player)
             
-            self.broadcast(f"\n🟢 {current_player.name}'s turn")
+            self.broadcast(f"\n🟢 {current_player.name}'s turn\n")
 
             self.take_turn(current_player)
 
-            # Check win condition here (placeholder)
-            if len(current_player.property_sets) >= 3:
-                self.send_all(f"🏆 {current_player.name} wins!")
-                self.running = False
-                break
-
+            if not self.running:
+                return
+            
             self.turn_index = (self.turn_index + 1) % len(self.players)
 
     def take_turn(self, player):
@@ -64,35 +62,66 @@ class Game:
         drawn_cards = player.draw_cards(self.deck, DRAW_TWO)
         self.msg_drawn_cards(player, drawn_cards)
 
-        #player chooses card to play
-        while player.actions_remaining > 0:
-            chosen_card, card_index, money_mode = self.choose_card(player)
+        self.send_message(player.get_hand_string(), player)
 
-            if chosen_card is None:
-                #print("Turn ended.")
-                self.broadcast(f"\n{player.name} ended their turn.")
+        choice = self.prompt_player("Enter 'q' to quit: ", player).strip().lower()
+
+        if choice == 'q':
+            print(f"[QUIT] {player.name} quit the game.")
+            self.end_game(f"{player.name} quit the game.")
+            return None, None, None
+
+        #player chooses card to play
+        # while player.actions_remaining > 0 and self.running:
+        #     chosen_card, card_index, money_mode = self.choose_card(player)
+
+        #     if chosen_card is None:
+        #         if not self.running:
+        #             return
+        #         self.broadcast(f"\n{player.name} ended their turn.")
                 
-                break
-            if not money_mode:
-                self.play_card(player, chosen_card, card_index)
-            else:
-                self.play_as_money(player, chosen_card, card_index)
+        #         break
+        #     if not money_mode:
+        #         self.play_card(player, chosen_card, card_index)
+        #     else:
+        #         self.play_as_money(player, chosen_card, card_index)
     
-    def choose_card(self):
+    def choose_card(self, player):
+        choice = self.prompt_player("Enter 'q' to quit: ", player)
+
+        choice = choice.strip().lower()
+
+        if choice == 'q':
+            print(f"[QUIT] {player.name} quit the game.")
+            self.end_game(f"{player.name} quit the game.")
+            return None, None, None
+
+        self.send_message("Only 'q' is supported in this test version.\n", player)
+        return None, None, None
+
+
+    def choose_card2(self, player):
         money_mode = False
 
         print(f"\n{self}")
         while True:
-            self.print_hand()
-
-            #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
-            choice = input(
+            choice_msg = (
                 "Choose an option:\n"
                 "  - Enter the number of the card to play\n"
-                "  -  Enter 'm' to switch to money mode (card will be played as money)\n"
+                "  - Enter 'm' to switch to money mode (card will be played as money)\n"
                 "  - Enter 'x' to end turn early\n"
                 "Your choice: "
-            ).strip().lower()
+            )
+
+
+            choice = self.prompt_player(choice_msg, player)
+            
+            print(f"[DEBUG] Player {player.name} entered: '{choice}'")  # Debug line
+
+            if choice is None:
+                return None, None, None  
+            
+            choice = choice.strip().lower()
             
             if choice.lower() == 'x':
                 return None, None, False
@@ -102,7 +131,7 @@ class Game:
                 money_mode = True
                 continue
 
-            if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
+            if not choice.isdigit() or (int(choice)-1) not in range(len(player.hand)):
                 print("Invalid choice. Try again.")
                 continue
 

@@ -11,7 +11,7 @@ def receive_messages(sock):
             if not msg:
                 break
             decoded = msg.decode()
-            print("\nFriend:", decoded)
+            print(decoded)
 
             if "Server is shutting down" in decoded:
                 shutdown_event.set()
@@ -23,7 +23,7 @@ def receive_messages(sock):
 def start_client():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        sock.connect(('localhost', 12345))
+        sock.connect(('localhost', 5555))
     except Exception as e:
         print("Connection failed:", e)
         return
@@ -31,16 +31,15 @@ def start_client():
     thread = threading.Thread(target=receive_messages, args=(sock,), daemon=True)
     thread.start()
 
-    print("You can start chatting. Type 'q' to quit and shut down server.")
+    print("Connected to server. Type messages or 'q' to quit and shut down the server.")
     try:
         while not shutdown_event.is_set():
             msg = input()
             if shutdown_event.is_set():
-                break  # extra check in case server shutdown message was received during input()
-            if msg.strip().lower() == 'q':
-                sock.send(msg.encode())
                 break
-            sock.send(msg.encode())
+            sock.send(msg.encode()) #sends message to server
+            if msg.strip().lower() == 'q':
+                break #let client exit input mode immediately, proceed to send 'q' to server to handle
     except BrokenPipeError:
         print("Server closed the connection.")
     except Exception as e:

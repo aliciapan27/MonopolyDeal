@@ -9,7 +9,7 @@ DRAW_TWO = 2
 STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, shutdown_event, send_message_func, broadcast_func):
+    def __init__(self, players, shutdown_event, send_message_func, broadcast_func, prompt_player_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
@@ -20,7 +20,7 @@ class Game:
         self.shutdown_event = shutdown_event
         self.send_message = send_message_func
         self.broadcast = broadcast_func
-        # self.prompt_player = prompt_player_func
+        self.prompt_player = prompt_player_func
         # self.set_active_player = set_active_player_func
         # self.end_game = end_game_func
 
@@ -32,11 +32,11 @@ class Game:
         else:
             message = "Deck is empty! You couldn't draw any cards."
 
-        self.send_message(message, player)
+        self.send_message(player, message)
 
     def start(self):
         shuffle_deck(self.deck)
-        self.broadcast("🎮 Game starting with two players!\n")
+        self.broadcast("\n🎮 Game starting with two players!\n")
 
         # Deal 5 cards to each player
         for player in self.players:
@@ -55,7 +55,7 @@ class Game:
 
             self.take_turn(current_player)
 
-            if self.game_over or self.shut_down_event.is_set():
+            if self.game_over or self.shutdown_event.is_set():
                 break
 
             self.curr_turn = (self.curr_turn + 1) % len(self.players)
@@ -68,37 +68,23 @@ class Game:
         self.msg_drawn_cards(player, drawn_cards)
 
         self.send_message(player, player.get_hand_string())
-
         self.send_message(player, "Enter 'q' to quit or 'x' to end your turn early.")
 
-        import time
-        time.sleep(2)  # Simulate player thinking
+        while player.actions_remaining > 0 and not self.shutdown_event.is_set():
+            choice = self.prompt_player(player, "Your move: ").strip().lower()
 
-        # Example quit shortcut
-        if self.shut_down_event.is_set():
-            return
+            if choice == 'q':
+                self.broadcast(f"{player.name} quit the game.")
+                self.end_game()
+                return
+
+            elif choice == 'x':
+                self.broadcast(f"{player.name} entered x (ended their turn).")
+                break
+
+            else:
+                self.send_message(player, f"You entered: {choice} (not implemented)")
     
-        # choice = self.prompt_player("Enter 'q' to quit: ", player).strip().lower()
-
-        # if choice == 'q':
-        #     print(f"[QUIT] {player.name} quit the game.")
-        #     self.end_game(f"{player.name} quit the game.")
-        #     return None, None, None
-
-        #player chooses card to play
-        # while player.actions_remaining > 0 and self.running:
-        #     chosen_card, card_index, money_mode = self.choose_card(player)
-
-        #     if chosen_card is None:
-        #         if not self.running:
-        #             return
-        #         self.broadcast(f"\n{player.name} ended their turn.")
-                
-        #         break
-        #     if not money_mode:
-        #         self.play_card(player, chosen_card, card_index)
-        #     else:
-        #         self.play_as_money(player, chosen_card, card_index)
     
     def choose_card(self):
         money_mode = False
@@ -187,3 +173,7 @@ class Game:
 
             #shouldn't discard money or properties, fix this later
             player.actions_remaining -= 1
+
+    def end_game(self):
+        self.broadcast(f"\n🛑 Game Over.")
+        self.game_over = True

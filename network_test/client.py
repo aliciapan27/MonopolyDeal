@@ -31,15 +31,13 @@ def start_client():
     thread = threading.Thread(target=receive_messages, args=(sock,), daemon=True)
     thread.start()
 
-    print("Connected to server. Type messages or 'q' to quit and shut down the server.")
+    print("Connected to server. Type messages or 'q' to quit the game.")
     try:
         while not shutdown_event.is_set():
             msg = input()
             if shutdown_event.is_set():
                 break
-            sock.send(msg.encode()) #sends message to server
-            if msg.strip().lower() == 'q':
-                break #let client exit input mode immediately, proceed to send 'q' to server to handle
+            sock.send(msg.encode())  # sends message to server
     except BrokenPipeError:
         print("Server closed the connection.")
     except Exception as e:

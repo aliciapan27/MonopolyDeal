@@ -29,13 +29,28 @@ def broadcast(message):
     for player in player_objs:
         send_message(player, message)
 
+def prompt_player(player, prompt_text) :
+    try:
+        send_message(player, prompt_text)
+        data = player.conn.recv(1024)
+        if not data:
+            return ''
+        return data.decode().strip()
+    except:
+        return ''
+
 def handle_client(conn, addr, name):
     player = conn_to_player[conn]
     print(f"[NEW CONNECTION] {name} ({addr}) connected.")
     send_message(player, f"Welcome {player.name}!")
     broadcast(f"{player.name} has joined the game.")
 
+    # Lobby: wait here until the game starts
     while not shutdown_event.is_set():
+        # If the game has started, the game will handle input via prompt_player
+        if game and not game.game_over:
+            break
+
         try:
             msg = conn.recv(1024)
             if not msg:
@@ -43,19 +58,14 @@ def handle_client(conn, addr, name):
             message = msg.decode().strip()
             print(f"[{name}] {message}")
 
-            if message.lower() == 'q':
-                print(f"[SHUTDOWN] '{name}' sent 'q'. Shutting down server.")
-                broadcast("Server is shutting down.")
-                shutdown_event.set()
-                break
-            else:
-                broadcast(f"{name}: {message}")
+            broadcast(f"{name}: {message}")
 
-        except:
-            break
+        except socket.timeout:
+            # if no message received but connection is alive
+            send_message(player, "Waiting for other players to join...")
 
-    conn.close()
-    print(f"[DISCONNECT] {name} disconnected.")
+    # DO NOT close conn here! The game still needs it
+    print(f"[INFO] {name} is now controlled by game logic.")
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -101,9 +111,25 @@ def start_game():
     for p in player_objs:
         print(f" - {p.name}")
 
-    game = Game(player_objs, shutdown_event, send_message, broadcast)
+    game = Game(player_objs, shutdown_event, send_message, broadcast, prompt_player)
     broadcast("All players connected.\n")
     game.start() 
 
+def shutdown_server():
+    print("[SHUTDOWN] Server shutting down...")
+    broadcast("Server shutting down...")
+    shutdown_event.set()
+    for conn, _ in players:
+        try:
+            conn.shutdown(socket.SHUT_RDWR)
+            conn.close()
+        except:
+            pass
+    os._exit(0)  # force exit to kill threads
+
 if __name__ == "__main__":
-    start_server()
+    threading.Thread(target=start_server, daemon=True).start()
+
+    while not shutdown_event.is_set():
+        if input().strip().lower() == 'q':
+            shutdown_server()

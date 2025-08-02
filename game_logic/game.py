@@ -1,7 +1,7 @@
 from game_logic.deck import create_deck, shuffle_deck
 from game_logic.card import *
 from game_logic.handle_cards import *
-
+import socket
 import threading
 
 STARTING_HAND = 5
@@ -9,7 +9,7 @@ DRAW_TWO = 2
 STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, shutdown_event, send_message_func, broadcast_func, prompt_player_func):
+    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, close_connection_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
@@ -17,12 +17,10 @@ class Game:
         self.game_over = False
         self.curr_turn = 0
 
-        self.shutdown_event = shutdown_event
         self.send_message = send_message_func
         self.broadcast = broadcast_func
         self.prompt_player = prompt_player_func
-        # self.set_active_player = set_active_player_func
-        # self.end_game = end_game_func
+        self.close_connection = close_connection_func
 
         self.deck = create_deck()
 
@@ -70,7 +68,7 @@ class Game:
         self.send_message(player, player.get_hand_string())
         self.send_message(player, "Enter 'q' to quit or 'x' to end your turn early.")
 
-        while player.actions_remaining > 0 and not self.shutdown_event.is_set():
+        while not self.game_over:
             choice = self.prompt_player(player, "Your move: ").strip().lower()
 
             if choice == 'q':
@@ -86,12 +84,12 @@ class Game:
                 self.send_message(player, f"You entered: {choice} (not implemented)")
     
     
-    def choose_card(self):
+    def choose_card(self, player):
         money_mode = False
 
         print(f"\n{self}")
         while True:
-            self.print_hand()
+            player.print_hand()
 
             #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
             choice = input(
@@ -177,3 +175,9 @@ class Game:
     def end_game(self):
         self.broadcast(f"\n🛑 Game Over.")
         self.game_over = True
+
+
+        for player in self.players:
+            self.close_connection(player)
+        
+        self.players.clear() 

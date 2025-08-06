@@ -4,6 +4,7 @@ import threading
 HOST = '127.0.0.1'
 PORT = 62743
 
+#python network/client.py
 class Client:
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

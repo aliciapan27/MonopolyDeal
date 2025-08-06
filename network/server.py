@@ -35,6 +35,7 @@ class Server:
             send_message_func=self.send_message,
             broadcast_func=self.broadcast,
             prompt_player_func=self.prompt_player,
+            broadcast_others_func=self.broadcast_others,
             close_connection_func=self.close_connection
         )
         game.shutdown_event = self.shutdown_event
@@ -45,10 +46,15 @@ class Server:
             player.conn.sendall(message.encode() + b'\n')
         except:
             print(f"[ERROR] Couldn't send message to {player.name}")
-
+    
     def broadcast(self, message):
         for player in self.players:
             self.send_message(player, message)
+    
+    def broadcast_others(self, exclude_player, message):
+        for player in self.players:
+            if player != exclude_player:
+                self.send_message(player, message)
 
     def prompt_player(self, player, prompt):
         self.send_message(player, prompt)

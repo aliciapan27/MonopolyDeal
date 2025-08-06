@@ -8,7 +8,7 @@ DRAW_TWO = 2
 STARTING_ACTIONS = 3
 
 class Game:
-    def __init__(self, players, send_message_func, broadcast_func, prompt_player_func, close_connection_func):
+    def __init__(self, players, send_message_func, broadcast_func, broadcast_others_func, prompt_player_func, close_connection_func):
         self.players = players
         self.discard_pile = []
         self.current_player_index = 0
@@ -18,6 +18,7 @@ class Game:
 
         self.send_message = send_message_func
         self.broadcast = broadcast_func
+        self.broadcast_others = broadcast_others_func
         self.prompt_player = prompt_player_func
         self.close_connection = close_connection_func
 
@@ -47,8 +48,9 @@ class Game:
     def game_loop(self):
         while not self.shutdown_event.is_set() and not self.game_over:
             current_player = self.players[self.curr_turn]
+
             self.send_message(current_player, "Your turn!\n")
-            self.broadcast(f"\n🟢 {current_player.name}'s turn\n")
+            self.broadcast_others(current_player, f"\n🟢 {current_player.name}'s turn\n")
 
             self.take_turn(current_player)
 
@@ -65,24 +67,39 @@ class Game:
         self.msg_drawn_cards(player, drawn_cards)
 
         self.send_message(player, player.get_hand_string())
+        while player.actions_remaining > 0 and not self.game_over:
+            self.send_message(player, player.get_hand_string())
 
-        card = self.choose_card(player)
-       
+            chosen_card, card_index, money_mode = self.choose_card(player)
+            
+            if chosen_card is None:
+                self.send_message(player, "You ended your turn.")
+                break
+
+            if not money_mode:
+                self.play_card(player, chosen_card, card_index)
+            else:
+                self.play_as_money(player, chosen_card, card_index)
+
+        self.send_message(player, "🔁 Turn over.")
     
     def choose_card(self, player):
         money_mode = False
 
-        print(f"\n{self}")
+        self.broadcast(f"\n{player}")
+
         while not self.game_over:
-            player.print_hand()
-            
-            prompt_message = ("Choose an option:\n"
-                "  - Enter the number of the card to play\n"
-                "  - Enter 'm' to switch to money mode (card will be played as money)\n"
-                "  - Enter 'x' to end turn early\n"
-                "  - Enter 'q' to quit game\n"
-                "Your choice: ")
-            
+            if not money_mode:
+                prompt_message = ("Choose an option:\n"
+                    "  - Enter the number of the card to play\n"
+                    "  - Enter 'm' to switch to money mode (card will be played as money)\n"
+                    "  - Enter 'x' to end turn early\n"
+                    "  - Enter 'q' to quit game\n"
+                    "Your choice: ")
+            else:
+                prompt_message = ("Enter the number of the card to play or 'q' to quit game\n"
+                    "Your choice: ")
+
             choice = self.prompt_player(player, prompt_message).strip().lower()
             if choice == 'q':
                 self.broadcast(f"{player.name} quit the game.")
@@ -90,20 +107,20 @@ class Game:
                 return None, None, False
 
             elif choice == 'x':
-                self.broadcast(f"{player.name} entered x (ended their turn).")
-                break
+                self.broadcast_others(player, f"{player.name} ended their turn.")
+                return None, None, False
 
             if choice.lower() == 'm':
-                print("Money mode activated: your next chosen card will be played as money.")
+                self.send_message(player, "Money mode activated: your next chosen card will be played as money.")
                 money_mode = True
                 continue
 
-            if not choice.isdigit() or (int(choice)-1) not in range(len(self.hand)):
+            if not choice.isdigit() or (int(choice)-1) not in range(len(player.hand)):
                 print("Invalid choice. Try again.")
                 continue
 
             card_index = int(choice)-1
-            chosen_card = self.hand[card_index]
+            chosen_card = player.hand[card_index]
             print(f"\nYou chose {chosen_card.name}")
             return chosen_card, card_index, money_mode
         

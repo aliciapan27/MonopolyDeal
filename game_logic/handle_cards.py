@@ -7,36 +7,38 @@ BDAY_DEBT = 2
 DEBT = 5
 
 #Helper functions
-def prompt_colour_choice(colours):
+def prompt_colour_choice(game, player, colours):
     print("Choose a property colour:")
     for i, colour in enumerate(colours, start=1):
             print(f"{i}: {colour.name.title()}")
     while True:
         try:
-            colour_choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= colour_choice < len(colours):
-                return colours[colour_choice]
+            colour_choice = game.prompt_player(player, "Enter the number of your choice: ")
+            index = int(colour_choice) -1
+            if 0 <= index < len(colours):
+                return colours[index]
             else:
-                print("Invalid choice.")
+                game.send_message(player, "❌ Invalid choice. Try again.")
         except ValueError:
-            print("Please enter a number.")
+            game.send_message(player, "Please enter a number.")
         
-def prompt_player_choice(target_players):
+def prompt_player_choice(game, player, target_players):
     print("Choose a player:")
     for i, other in enumerate(target_players, start=1):
         print(f"{i}: {other}")
 
     while True:
         try:
-            choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= choice < len(target_players):
-                return target_players[choice]
+            choice = game.prompt_player(player, "Enter the number of your choice: ")
+            index = int(choice) -1
+            if 0 <= index < len(target_players):
+                return target_players[index]
             else:
-                print("Invalid choice.")
+                game.send_message(player, "Invalid choice.")
         except ValueError:
-            print("Please enter a number.")
+            game.send_message(player, "Please enter a number.")
 
-def prompt_property_choice(properties):
+def prompt_property_choice(game, player, properties):
     print("\nChoose a property:")
 
     for i, property in enumerate(properties, start = 1):
@@ -44,16 +46,17 @@ def prompt_property_choice(properties):
             
     while True:
         try:
-            choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= choice < len(properties):
-                return properties[choice]
+            choice = game.prompt_player(player, "Enter the number of your choice: ")
+            index = int(choice) -1
+            if 0 <= index < len(properties):
+                return properties[index]
             else:
                 print("Invalid choice. Try again.")
 
         except ValueError:
             print("Please enter a number.")
 
-def prompt_full_set_choice(full_sets):
+def prompt_full_set_choice(game, player, full_sets):
     print("\nChoose a full set:")
 
     for i, property in enumerate(full_sets, start = 1):
@@ -61,9 +64,10 @@ def prompt_full_set_choice(full_sets):
             
     while True:
         try:
-            choice = int(input("Enter the number of your choice: ")) - 1
-            if 0 <= choice < len(full_sets):
-                return full_sets[choice]
+            choice = game.prompt_player(player, "Enter the number of your choice: ")
+            index = int(choice) -1
+            if 0 <= index < len(full_sets):
+                return full_sets[index]
             else:
                 print("Invalid choice. Try again.")
 
@@ -83,57 +87,59 @@ def try_just_say_no(game, attacker, defender):
 
                 #Check if attacker has a just say no to play
                 if try_just_say_no(game, defender, attacker):
-                    print(f"{attacker.name}'s Just Say No cancels {defender.name}'s Just Say No.")
+                    game.broadcast(f"{attacker.name}'s Just Say No cancels {defender.name}'s Just Say No.")
                     return False #original just say no blocked
                 else:
                     return True #action blocked successfully
     return False #no just say no played
 
-def prompt_payment(game, payer, collector, amount_due):
+def prompt_payment(self, payer, collector, amount_due):
     message = ACTION_MESSAGES["prompt_payment"]
-    if try_just_say_no(game, collector, payer):
-        return None
 
-    print(message["prompt"].format(payer=payer.name, amount_due = amount_due))
-    print("Your bank:")
-    for i, card in enumerate(payer.bank, start=1):
-        print(f"{i}: {card}")
+    if self.try_just_say_no(collector, payer):
+        return None
 
     selected_indices = []
     total_given = 0
 
-    #while payer has money
+    self.send_message(payer, message["prompt"].format(payer=payer.name, amount_due=amount_due))
+
     while total_given < amount_due:
         remaining_cards = [c for i, c in enumerate(payer.bank) if i not in selected_indices]
-        remaining_value = sum(card.value for card in remaining_cards)
-
-        # if remaining_value + total_given < amount_due:
-        #     print(message["not_enough"].format(payer = payer.name))
 
         if not remaining_cards:
-            print(message["no_money"].format(payer = payer.name))
+            self.send_message(payer, message["no_money"].format(payer=payer.name))
             break
 
-        choice = input(f"Select a card number to give (total given: ${total_given}M): ")
+        # Show current bank
+        bank_string = "Your bank:\n"
+        for i, card in enumerate(payer.bank, start=1):
+            if i - 1 in selected_indices:
+                continue
+            bank_string += f"{i}: {card}\n"
+
+        bank_string += f"\n💰 Total given so far: ${total_given}M"
+        if total_given < amount_due:
+            bank_string += f"\nYou still owe: ${amount_due - total_given}M"
+
+        # Prompt player
+        choice = self.prompt_player(payer, bank_string + "\nSelect a card number to give:")
+
         if not choice.isdigit():
-            print("Please enter a valid number.")
+            self.send_message(payer, "Please enter a valid number.")
             continue
 
         money_choice = int(choice) - 1
         if money_choice < 0 or money_choice >= len(payer.bank):
-            print("Invalid card number.")
+            self.send_message(payer, "Invalid card number.")
             continue
         if money_choice in selected_indices:
-            print("Card already selected.")
+            self.send_message(payer, "Card already selected.")
             continue
 
         selected_indices.append(money_choice)
         total_given += payer.bank[money_choice].value
 
-        if total_given < amount_due:
-            print(f"Total given so far is ${total_given}M. You still owe ${amount_due - total_given}M.")
-
-    # remove the chosen cards in reverse order so indices don't shift
     selected_indices.sort(reverse=True)
     return [payer.bank.pop(i) for i in selected_indices]
 
@@ -194,12 +200,12 @@ def handle_wildcard(game, player, card):
     # Universal wildcard
     if card.colours[0] == PropertyColour.ANY:
         valid_colours = [colour for colour in PropertyColour if colour != PropertyColour.ANY]
-        chosen_colour = prompt_colour_choice(valid_colours)
+        chosen_colour = prompt_colour_choice(game, player, valid_colours)
 
     # Two-colour wildcard
     else:
         valid_colours = card.colours
-        chosen_colour = prompt_colour_choice(valid_colours)
+        chosen_colour = prompt_colour_choice(game, player, valid_colours)
     
     #set wildcard colour
     card.colour = chosen_colour
@@ -293,7 +299,7 @@ def handle_debt_collector_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     target_players = [p for p in game.players if p != player]
-    chosen_player = prompt_player_choice(target_players)
+    chosen_player = prompt_player_choice(game, player, target_players)
     collect_payment(game, player, chosen_player, DEBT)
     return True
 
@@ -315,14 +321,14 @@ def handle_force_deal_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     #choose player to trade with
-    chosen_player = prompt_player_choice(target_players)
+    chosen_player = prompt_player_choice(game, player, target_players)
 
     #choose property to trade with
     print(message["wanted_card"].format(player=chosen_player.name))
-    wanted_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+    wanted_card = prompt_property_choice(game, player, chosen_player.get_tradeable_properties())
     
     print(message["your_card"])
-    card_to_swap = prompt_property_choice(player.get_tradeable_properties())
+    card_to_swap = prompt_property_choice(game, player, player.get_tradeable_properties())
     
     #remove cards from set
     chosen_player.property_sets[wanted_card.colour].remove_card(wanted_card)
@@ -352,11 +358,11 @@ def handle_sly_deal_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     #choose player to steal from
-    chosen_player = prompt_player_choice(target_players)
+    chosen_player = prompt_player_choice(game, player, target_players)
 
     #choose property to steal
     print(message["wanted_card"].format(player=chosen_player.name))
-    wanted_card = prompt_property_choice(chosen_player.get_tradeable_properties())
+    wanted_card = prompt_property_choice(game, player, chosen_player.get_tradeable_properties())
     
     #remove card from set
     chosen_player.property_sets[wanted_card.colour].remove_card(wanted_card)
@@ -375,7 +381,7 @@ def handle_rent_card(game, player, card):
         valid_colours = card.colours
         #Choose colour
         print(message["colour_intro"].format(player = player.name))
-        chosen_colour = prompt_colour_choice(valid_colours)
+        chosen_colour = prompt_colour_choice(game, player, valid_colours)
 
         rent = player.property_sets[chosen_colour].rent
 
@@ -400,7 +406,7 @@ def handle_rent_card(game, player, card):
         valid_colours = [colour for colour in PropertyColour if colour != PropertyColour.ANY]
         #Choose colour
         print(message["any_intro"].format(player = player.name))
-        chosen_colour = prompt_colour_choice(valid_colours)
+        chosen_colour = prompt_colour_choice(game, player, valid_colours)
 
         rent = player.property_sets[chosen_colour].rent
 
@@ -416,7 +422,7 @@ def handle_rent_card(game, player, card):
         #Choose player
         print(message["choose_target"].format(player = player.name, colour = chosen_colour.name.title(), rent = rent))
         target_players = [p for p in game.players if p != player]
-        chosen_player = prompt_player_choice(target_players)
+        chosen_player = prompt_player_choice(game, player, target_players)
         
         collect_payment(game, player, chosen_player, rent)
     return True
@@ -441,11 +447,11 @@ def handle_deal_breaker_card(game, player, card):
     print(message["intro"].format(player = player.name))
     
     #choose player to steal from
-    chosen_player = prompt_player_choice(target_players)
+    chosen_player = prompt_player_choice(game, player, target_players)
 
     #choose property to steal
     print(message["wanted_card"].format(player=chosen_player.name))
-    wanted_set = prompt_full_set_choice(chosen_player.get_full_sets())
+    wanted_set = prompt_full_set_choice(game, player, chosen_player.get_full_sets())
     
     #remove full set
     del chosen_player.property_sets[wanted_set.colour]

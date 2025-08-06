@@ -1,7 +1,6 @@
 from game_logic.deck import create_deck, shuffle_deck
 from game_logic.card import *
 from game_logic.handle_cards import *
-import socket
 import threading
 
 STARTING_HAND = 5
@@ -66,42 +65,33 @@ class Game:
         self.msg_drawn_cards(player, drawn_cards)
 
         self.send_message(player, player.get_hand_string())
-        self.send_message(player, "Enter 'q' to quit or 'x' to end your turn early.")
 
-        while not self.game_over:
-            choice = self.prompt_player(player, "Your move: ").strip().lower()
-
-            if choice == 'q':
-                self.broadcast(f"{player.name} quit the game.")
-                self.end_game()
-                return
-
-            elif choice == 'x':
-                self.broadcast(f"{player.name} entered x (ended their turn).")
-                break
-
-            else:
-                self.send_message(player, f"You entered: {choice} (not implemented)")
-    
+        card = self.choose_card(player)
+       
     
     def choose_card(self, player):
         money_mode = False
 
         print(f"\n{self}")
-        while True:
+        while not self.game_over:
             player.print_hand()
-
-            #choice = input("Enter the number of the card to play or 'm' for money mode (card chosen will be played as money) (or 'q' to quit): ")
-            choice = input(
-                "Choose an option:\n"
+            
+            prompt_message = ("Choose an option:\n"
                 "  - Enter the number of the card to play\n"
                 "  - Enter 'm' to switch to money mode (card will be played as money)\n"
                 "  - Enter 'x' to end turn early\n"
-                "Your choice: "
-            ).strip().lower()
+                "  - Enter 'q' to quit game\n"
+                "Your choice: ")
             
-            if choice.lower() == 'x':
+            choice = self.prompt_player(player, prompt_message).strip().lower()
+            if choice == 'q':
+                self.broadcast(f"{player.name} quit the game.")
+                self.end_game()
                 return None, None, False
+
+            elif choice == 'x':
+                self.broadcast(f"{player.name} entered x (ended their turn).")
+                break
 
             if choice.lower() == 'm':
                 print("Money mode activated: your next chosen card will be played as money.")
@@ -176,8 +166,9 @@ class Game:
         self.broadcast(f"\n🛑 Game Over.")
         self.game_over = True
 
-
         for player in self.players:
             self.close_connection(player)
         
         self.players.clear() 
+        if self.shutdown_event:
+            self.shutdown_event.set() 

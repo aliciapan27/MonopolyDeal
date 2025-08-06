@@ -72,10 +72,21 @@ class Server:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((HOST, PORT))
             s.listen()
+            s.settimeout(1.0)
             print(f"[SERVER] Listening on {HOST}:{PORT}")
             while not self.shutdown_event.is_set():
-                conn, addr = s.accept()
-                threading.Thread(target=self.handle_client, args=(conn, addr), daemon=True).start()
+                try:
+                    conn, addr = s.accept()
+                    threading.Thread(target=self.handle_client, args=(conn, addr), daemon=True).start()
+
+                except socket.timeout:
+                    # This is expected, just loop again to check shutdown_event
+                    continue
+                except Exception as e:
+                    print(f"[ERROR] Accept failed: {e}")
+                    break
+            print("[SERVER] Shutdown complete.")
+            sys.exit(0) 
 
 if __name__ == '__main__':
     Server().run()

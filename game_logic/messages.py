@@ -18,26 +18,26 @@ ACTION_MESSAGES = {
         "fail": "\n{target} has no money to pay."
     },
     ActionType.DEBT_COLLECTOR: {
-        "intro": "\n💰 Debt Collector! {player}, force a player to pay you $5M.",
+        "intro": "\n💰 Debt Collector! Force a player to pay you $5M.",
         "success": "\n{target} pays {player} $5M.",
         "fail": "\n{target} has no money to pay."
     },
     ActionType.FORCE_DEAL: {
-        "intro": "\n🔁 Forced Deal! {player}, force a player to swap properties with you.",
+        "intro": "\n🔁 Forced Deal! Force a player to swap properties with you.",
         "fail1": "\nYou have no properties to trade.",
         "fail2": "\nNo other players have tradeable properties.",
         "wanted_card": "\nWhich one of {player}'s properties do you want?",
         "your_card": "Which one of your properties do you want to swap?"
     },
     ActionType.SLY_DEAL: {
-        "intro": "\n🕵️ Sly Deal! {player}, choose a player to steal from.",
+        "intro": "\n🕵️ Sly Deal! Choose a player to steal from.",
         "fail": "\nNo other players have stealable properties.",
         "wanted_card": "\nWhich one of {player}'s properties do you want?"
     },
     ActionType.RENT: {
-        "colour_intro": "\n💸 Time to pay rent! {player}, choose a colour property.",
+        "colour_intro": "\n💸 Time to collect rent! Choose a colour property.",
         "colour_collect": "\nEveryone pays {player} ${rent}M for {colour} properties!",
-        "any_intro": "\n💸 Time to pay rent for! {player}, choose a colour property.",
+        "any_intro": "\n💸 Time to pay rent! Choose a colour property.",
         "choose_target": "\nForce a player to pay you ${rent}M for {colour} properties.",        
         "any_success": "\n {target} pays {player} ${rent}M.",
         "fail": "\n{target} has no money to pay.",
@@ -52,7 +52,7 @@ ACTION_MESSAGES = {
         "intro": "\n🚨💰 {player} doubled the rent!"
     },
     ActionType.DEAL_BREAKER: {
-        "intro": "\n💼💥 Deal Breaker! {player}, steal any full set!",
+        "intro": "\n💼💥 Deal Breaker! Steal any full set!",
         "fail": "\nNo players have full sets to steal.",
         "wanted_card": "\nWhich one of {player}'s full sets' do you want?"
     },

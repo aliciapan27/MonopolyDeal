@@ -66,7 +66,6 @@ class Game:
         drawn_cards = player.draw_cards(self.deck, DRAW_TWO)
         self.msg_drawn_cards(player, drawn_cards)
 
-        self.send_message(player, player.get_hand_string())
         while player.actions_remaining > 0 and not self.game_over:
             self.send_message(player, player.get_hand_string())
 

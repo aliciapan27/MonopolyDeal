@@ -19,17 +19,18 @@ export default function WelcomeScreen({ onStart }) {
       <img src={monopolyLogo} alt="Monopoly Logo" className="logo" />
       <img src={deal} alt="deal" className="deal" />
 
-      <input
-        type="text"
-        placeholder="Enter your name"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className="username-input"
-      />
-
-      <button className="start-button" onClick={handleStart}>
-        Start Game
-      </button>
+      <div className="form-container">
+        <input
+          type="text"
+          placeholder="Enter your name"
+          className="name-input"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <button className="start-button" onClick={handleStart}>
+          ✓ Join Game
+        </button>
+      </div>
     </div>
   );
 }

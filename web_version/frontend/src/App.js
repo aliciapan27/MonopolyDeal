@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import WelcomeScreen from "./WelcomeScreen";
+import Lobby from "./Lobby";
 
 export default function App() {
   const [username, setUsername] = useState("");
+  const [inLobby, setInLobby] = useState(false);
 
   if (!username) {
     return <WelcomeScreen onStart={setUsername} />;
   }
 
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px", fontSize: "2rem" }}>
-      Hi {username} 👋
-    </div>
-  );
+  return <Lobby username={username} />;
 }

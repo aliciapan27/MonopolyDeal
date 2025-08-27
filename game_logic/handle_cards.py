@@ -148,7 +148,7 @@ def prompt_payment(game, payer, collector, amount_due):
 
 def collect_payment(game, collector, payer, amount):
         if len(payer.bank) == 0:
-            game.broadcast("{payer.name} has no money to pay.")
+            game.broadcast(f"{payer.name} has no money to pay.")
             return False
 
         cards_given = prompt_payment(game, payer, collector, amount)

@@ -8,6 +8,24 @@ This is a Python implementation of the Monopoly Deal card game that currently su
 
 - Python 3.7 or higher
 - Standard Python libraries (socket, threading, etc.)
+- Currently, no additional dependencies are required (requirements.txt might be empty)
+
+---
+
+## Setup
+
+1. **Create and activate a virtual environment:**
+
+```bash
+ python -m venv .venv
+ source .venv/bin/activate   # macOS/Linux
+ .venv\Scripts\activate      # Windows
+```
+
+2. **Install dependencies (if any):**
+```bash
+   pip install -r requirements.txt
+```
 
 ---
 
